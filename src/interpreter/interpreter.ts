@@ -224,7 +224,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     SingleParam: function* (node: any, context: Context) {
-      throw new Error(`not supported yet: ${node.type}`)
+        throw new Error(`not supported yet: ${node.type}`)
     },
 
     MultiParam: function* (node: any, context: Context) {
@@ -308,11 +308,11 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     DclStatement: function* (node: any, context: Context) {
-      push(A, node.d)
+        push(A, node.d)
     },
 
     DclAssignment: function* (node: any, context: Context) {
-      push(A,{type: 'Assignment', lv: { type: 'IdLvalue', id: node.d.id}, val: node.val}, node.d)
+        push(A,{type: 'Assignment', lv: { type: 'IdLvalue', id: node.d.id}, val: node.val}, node.d)
     },
 
     ReturnStatement: function* (node: any, context: Context) {
@@ -399,7 +399,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     Dcl: function* (node: any, context: Context) {
-      assign(node.id.text, unassigned, E)
+        assign(node.id.text, unassigned, E)
     },
 
     Predicate: function* (node: any, context: Context) {
