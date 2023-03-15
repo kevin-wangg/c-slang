@@ -339,11 +339,11 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     BinopExpr: function* (node: any, context: Context) {
-        push(A, {type: "BinopExpr_i", sym: node.binop}, node.second, node.first)
+        push(A, {type: "BinopExpr_i", sym: node.binop}, node.first, node.second)
     },
 
     BinlogExpr: function* (node: any, context: Context) {
-        push(A, {type: "BinlogExpr_i", sym: node.binlog}, node.second, node.first)
+        push(A, {type: "BinlogExpr_i", sym: node.binlog}, node.first, node.second)
     },
 
     IdExpr: function* (node: any, context: Context) {
