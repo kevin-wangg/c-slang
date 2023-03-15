@@ -94,7 +94,7 @@ const peek = (array: Array<any>): any => array.slice(-1)[0]
 
 const isTypeMatch = (lval: string, val: any, type: string): boolean => {
     if (val == unassigned) {
-      return true
+        return true
     } else if (type == 'StringType' && isString(val)) {
         return true
     } else if (type == 'BoolType' && isBoolean(val)) {
@@ -314,7 +314,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     DclAssignment: function* (node: any, context: Context) {
-      push(A,{type: 'Assignment', lv: { type: 'IdLvalue', id: node.d.id}, val: node.val}, node.d)
+        push(A,{type: 'Assignment', lv: { type: 'IdLvalue', id: node.d.id}, val: node.val}, node.d)
     },
 
     ReturnStatement: function* (node: any, context: Context) {
