@@ -155,6 +155,53 @@ const isUnassigned = (v: any): boolean => {
     )
 }
 
+// Memory stuff
+let HEAP: Uint8Array
+let heap_size: number
+
+const heap_make = (bytes: number) => {
+    const data = new ArrayBuffer(bytes) // By default every value is initialized to 0
+    const view = new Uint8Array(data)
+    return view
+}
+
+const initialize_machine = (heapsize_bytes: number) => {
+    HEAP = heap_make(heapsize_bytes)
+    heap_size = heapsize_bytes
+}
+
+const heap_allocate = (bytes: number) => {
+    let i = 0;
+    while(i < heap_size) {
+        if(HEAP[i] == 0) {
+            let ok = true
+            for(let j = i; j <= i + bytes; ++j) {
+                if(HEAP[j] != 0) {
+                    ok = false;
+                    break;
+                }
+            }
+            if(ok) {
+                HEAP[i] = bytes
+                return i + 1;
+            }
+            i++;
+        }
+        else {
+            i += HEAP[i] + 1;
+        }
+    }
+    return -1;
+}
+
+const heap_get = (addr: number) => {
+    return HEAP[addr]
+}
+
+const heap_set = (addr: number, val: number) => {
+    HEAP[addr] = val 
+}
+
 // Interpreter configurations:
 // A: agenda: stack of commands
 // S: stash: stack of values
@@ -462,6 +509,8 @@ export function* evaluate(node: es.Node, context: Context) {
     A.push(node)
     S = []
     E = pair(global_frame, global_environment)
+
+    initialize_machine(10000); // start program with 10000 bytes of memory
 
     let i = 0
     while (i < step_limit) {
