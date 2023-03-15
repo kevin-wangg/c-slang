@@ -213,7 +213,12 @@ const heap_set = (addr: number, val: number) => {
     HEAP[addr] = val
 }
 
-const type_sizes = {}
+const type_sizes = {
+    BoolType: 1,
+    IntType: 4,
+    IntStarType: 4,
+    BoolStarType: 4
+}
 
 // Interpreter configurations:
 // A: agenda: stack of commands
@@ -315,6 +320,14 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
     IntStarType: function* (node: any, context: Context) {
         // Do Nothing
+    },
+
+    BoolStarType: function* (node: any, context: Context) {
+        // Do Nothing
+    },
+
+    DerefAddress: function* (node: any, context: Context) {
+        throw new Error(`not supported yet: ${node.type}`)
     },
 
     ArgsList: function* (node: any, context: Context) {
@@ -442,6 +455,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
         const locals: Array<Pair<string,string>> = scan(node.stmnts)
         const unassignedList: Array<any> = locals.map(_ => {
             console.log(locals)
+
             return unassigned
         })
         if (!(A.length === 0)) {
