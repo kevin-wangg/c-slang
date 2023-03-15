@@ -294,7 +294,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     PrintfStatement: function* (node: any, context: Context) {
-        throw new Error(`not supported yet: ${node.type}`)
+        push(A, {type: 'Print_i'}, node.body)
     },
 
     DclStatement: function* (node: any, context: Context) {
@@ -447,6 +447,10 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
         if(S.pop()){
             push(A, node, node.pred, node.body)
         }
+    },
+
+    Print_i: function* (node: any, context: Context) {
+        console.log(S.pop())
     },
 }
 // tslint:enable:object-literal-shorthand
