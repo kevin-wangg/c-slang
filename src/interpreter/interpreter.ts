@@ -1,9 +1,10 @@
 /* tslint:disable:max-classes-per-file */
 import * as es from 'estree'
-import { isBoolean, isInteger, isString, isUndefined } from 'lodash'
+import { isBoolean, isInteger, isNumber, isString, isUndefined } from 'lodash'
 
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
 import { Pair, pair } from '../stdlib/list'
+import { is_number } from '../stdlib/misc'
 import { Context, Environment, Value } from '../types'
 import { evaluateBinaryExpression, evaluateUnaryExpression } from '../utils/operators'
 import * as rttc from '../utils/rttc'
@@ -92,7 +93,7 @@ const push = (array: Array<any>, ...items: any): Array<any> => {
 
 const peek = (array: Array<any>): any => array.slice(-1)[0]
 
-const isTypeMatch = (lval: string, val: any, type: string): boolean => {
+const isTypeMatch = (val: any, type: string): boolean => {
     if (val == unassigned) {
         return true
     } else if (type == 'StringType' && isString(val)) {
@@ -105,19 +106,43 @@ const isTypeMatch = (lval: string, val: any, type: string): boolean => {
     return false
 }
 
-const assign = (lval: string, val: any, env: Pair<any, any>): void => {
+const assign = (lval: string, val: number, env: Pair<any, any>): void => {
     if (env == null) throw new Error('unbound name: ' + lval)
-    if (env[0].hasOwnProperty(lval) && !isUndeclared(lval)) {
-        const type = env[0][lval][0]
-        if (isTypeMatch(lval, val, type)) {
-            env[0][lval][1] = val
-        } else {
-            throw new Error('Type mismatch: ' + lval + ' is a ' + type)
-        }
-    } else if (isUndeclared(lval)) {
-        throw new Error('Assigning a value to an undeclared variable ' + lval)
+    if (env[0].hasOwnProperty(lval)) {
+        env[0][lval][1] = val
+        // const type = env[0][lval][0]
+        // if (isTypeMatch(lval, val, type)) {
+        //     env[0][lval][1] = val
+        // } else {
+        //     throw new Error('Type mismatch: ' + lval + ' is a ' + type)
+        // }
     } else {
         assign(lval, val, env[1])
+    }
+}
+
+const heap_assign = (type: string, val: any, env_addr: number) => {
+    // console.log(`HEAP ASSIGN ${type} ${val} ${env_addr}`)
+    if(isTypeMatch(val, type)) {
+        if(isNumber(val)) {
+            heap_set_int(env_addr, val)
+        }
+        else {
+            throw new Error('Variable type in heap not yet supported')
+        }
+    }
+    else {
+        throw new Error(`Type mismatch: ${type} ${val}`)
+    }
+}
+
+const heap_lookup = (type: string, env_addr: number) => {
+    // console.log(`HEAP LOOKUP ${type} ${env_addr}`)
+    if(type == 'IntType') {
+        return heap_get_int(env_addr) 
+    }    
+    else {
+        throw new Error(`${type} lookup in heap not yet supported`)
     }
 }
 
@@ -133,14 +158,15 @@ const scan = (stmts: any): Array<Pair<string, string>> => {
     return locals
 }
 
-const lookup = (lval: string, env: Pair<any, any>): any => {
+const lookup = (lval: string, env: Pair<any, any>): Pair<any, any> => {
     if (env == null) {
         throw new Error('Unbound name: ' + lval)
     }
     if (env[0].hasOwnProperty(lval)) {
-        const v = env[0][lval][1]
-        if (isUnassigned(v) || isUndeclared(v))
-            throw new Error('Unassigned or undeclared name for ' + lval)
+        const v = env[0][lval]
+        // console.log(`LOOKUP ${lval}, found ${v}`)
+        // if (isUnassigned(v) || isUndeclared(v))
+        //     throw new Error('Unassigned or undeclared name for ' + lval)
         return v
     }
     return lookup(lval, env[1])
@@ -211,6 +237,37 @@ const heap_get = (addr: number) => {
 
 const heap_set = (addr: number, val: number) => {
     HEAP[addr] = val
+}
+
+const heap_get_int = (addr: number) => {
+    let first_byte = heap_get(addr)
+    let second_byte = heap_get(addr + 1)
+    let third_byte = heap_get(addr + 2)
+    let fourth_byte = heap_get(addr + 3)
+    return (first_byte << 24) | (second_byte << 16) | (third_byte << 8) | fourth_byte
+}
+
+const heap_set_int = (addr: number, num: number) => {
+    heap_set(addr, get_int_first_byte(num)) 
+    heap_set(addr + 1, get_int_second_byte(num)) 
+    heap_set(addr + 2, get_int_third_byte(num)) 
+    heap_set(addr + 3, get_int_fourth_byte(num)) 
+}
+
+const get_int_first_byte = (num: number) => {
+    return (num & 0xFF000000) >> 24
+}
+
+const get_int_second_byte = (num: number) => {
+    return (num & 0x00FF0000) >> 16
+}
+
+const get_int_third_byte = (num: number) => {
+    return (num & 0x0000FF00) >> 8
+}
+
+const get_int_fourth_byte = (num: number) => {
+    return num & 0x000000FF
 }
 
 const type_sizes = {
@@ -420,7 +477,12 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     IdExpr: function* (node: any, context: Context) {
-        push(S, lookup(node.id.text, E))
+        let [type, addr] = lookup(node.id.text, E)
+        if(isUndeclared(addr)) {
+            throw new Error(`Lookup of undeclared variable ${node.id.text}`)
+        }
+        let val = heap_lookup(type, addr)
+        push(S, val)
     },
 
     FnExpr: function* (node: any, context: Context) {
@@ -432,11 +494,11 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     StarExpr: function* (node: any, context: Context) {
-        throw new Error(`not supported yet: ${node.type}`)
+        push(A, { type: 'StarExpr_i' }, node.first)
     },
 
     AmpersandExpr: function* (node: any, context: Context) {
-        throw new Error(`not supported yet: ${node.type}`)
+        push(A, { type: 'AmperSandExpr_i'}, node.first)
     },
 
     Program: function* (node: any, context: Context) {
@@ -453,20 +515,17 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
     Block: function* (node: any, context: Context) {
         const locals: Array<Pair<string,string>> = scan(node.stmnts)
-        const unassignedList: Array<any> = locals.map(_ => {
-            console.log(locals)
-
-            return unassigned
-        })
+        const unDeclaredList: Array<any> = locals.map(_ => undeclared)
         if (!(A.length === 0)) {
             push(A, {type: 'Environment_i', env: E})
         }
         push(A, node.stmnts)
-        E = extendEnvironment(locals, unassignedList, E)
+        E = extendEnvironment(locals, unDeclaredList, E)
     },
 
     Dcl: function* (node: any, context: Context) {
-        assign(node.id.text, unassigned, E)
+        const addr = heap_allocate(type_sizes[node.t.type])
+        assign(node.id.text, addr, E)
     },
 
     Predicate: function* (node: any, context: Context) {
@@ -474,6 +533,21 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     // Instructions
+    StarExpr_i: function* (node: any, context: Context) {
+        const expr = S.pop()
+        if(!isNumber(expr)) {
+            throw new Error(`Can't dereference a non address value: ${expr}`)
+        }
+        // need to add types directly in heap i think
+        push(S, heap)
+    },
+
+    AmperSandExpr_i: function* (node: any, context: Context) {
+        const expr = S.pop()
+        let [type, addr] = lookup()
+        // need to change grammar so ampersand to lvalue
+    },
+
     UnopExpr_i: function* (node: any, context: Context) {
         const value = S.pop()
         const error = rttc.checkUnaryExpression(node, node.sym, value)
@@ -505,7 +579,15 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     Assignment_i: function* (node: any, context: Context) {
-        assign(node.sym.id.text, S.pop(), E)
+        let [type, addr] = lookup(node.sym.id.text, E)
+        if(isUndeclared(addr)) {
+            throw new Error('Assignment to undeclared variable')
+        }
+        if(!isNumber(addr)) {
+            throw new Error('Invalid variable value. Should be address')
+        }
+        let new_val = S.pop()
+        heap_assign(type, new_val, addr)
     },
 
     Environment_i: function* (node: any, context: Context) {
@@ -553,12 +635,14 @@ export function* evaluate(node: es.Node, context: Context) {
         }
 
         // Debugging
-        console.log('PRINTING A')
-        console.log(A)
-        console.log('PRINTING S')
-        console.log(S)
-        console.log('PRINTING E')
-        console.log(E)
+        // console.log('PRINTING A')
+        // console.log(A)
+        // console.log('PRINTING S')
+        // console.log(S)
+        // console.log('PRINTING E')
+        // console.log(E)
+        // console.log('PRINTING HEAP')
+        // console.log(HEAP)
 
         const cmd = A.pop()
         yield* evaluators[cmd.type](cmd, context)

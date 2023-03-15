@@ -30,7 +30,7 @@ expr: INT # Int
 	| id=ID '(' arglst=args ')' # FnExpr
 	| 'malloc' '(' first=expr ')' # MallocExpr
 	| '*' first=expr # StarExpr
-	| '&' first=expr # AmpersandExpr
+	| '&' first=lvalue # AmpersandExpr
     ;
 statement: lv=lvalue '=' val=expr ';' # Assignment
        | 'if' '(' pred=predicate ')' cons=block 'else' alt=block # IfStatement
