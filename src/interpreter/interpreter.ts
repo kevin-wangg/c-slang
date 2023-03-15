@@ -79,7 +79,9 @@ const push = (array: Array<any>, ...items: any): Array<any> => {
 const peek = (array: Array<any>): any => array.slice(-1)[0]
 
 const isTypeMatch = (lval: string, val: any, type: string): boolean => {
-  if (type == 'StringType' && isString(val)) {
+  if (val == unassigned) {
+    return true;
+  } else if (type == 'StringType' && isString(val)) {
     return true
   } else if (type == 'BoolType' && isBoolean(val)) {
     return true
@@ -91,13 +93,15 @@ const isTypeMatch = (lval: string, val: any, type: string): boolean => {
 
 const assign = (lval: string, val: any, env: Pair<any, any>): void => {
   if (env == null) throw new Error('unbound name: ' + lval)
-  if (env[0].hasOwnProperty(lval)) {
+  if (env[0].hasOwnProperty(lval) && !isUndeclared(lval)) {
     const type = env[0][lval][0]
     if (isTypeMatch(lval, val, type)) {
       env[0][lval][1] = val
     } else {
       throw new Error('Type mismatch: ' + lval + ' is a ' + type)
     }
+  } else if (isUndeclared(lval)) {
+    throw new Error('Assigning a value to an undeclared variable ' + lval)
   } else {
     assign(lval, val, env[1])
   }
@@ -121,7 +125,7 @@ const lookup = (lval: string, env: Pair<any, any>): any => {
   }
   if (env[0].hasOwnProperty(lval)) {
     const v = env[0][lval][1]
-    if (isUnassigned(v)) throw new Error('Unassigned name for ' + lval)
+    if (isUnassigned(v) || isUndeclared(v)) throw new Error('Unassigned or undeclared name for ' + lval)
     return v
   }
   return lookup(lval, env[1])
@@ -151,6 +155,11 @@ const extendEnvironment = (
 const unassigned = { type: 'Unassigned' }
 const isUnassigned = (v: any): boolean => {
   return v !== null && typeof v === 'object' && v.hasOwnProperty('type') && v.type === 'Unassigned'
+}
+
+const undeclared = { type: 'Undeclared' }
+const isUndeclared= (v: any): boolean => {
+  return v !== null && typeof v === 'object' && v.hasOwnProperty('type') && v.type === 'Undeclared'
 }
 
 // Interpreter configurations:
@@ -297,11 +306,11 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
   },
 
   DclStatement: function* (node: any, context: Context) {
-    throw new Error(`not supported yet: ${node.type}`)
+    push(A, node.d)
   },
 
   DclAssignment: function* (node: any, context: Context) {
-    push(A, {type: 'Assignment', lv: { type: 'IdLvalue', id: node.d.id}, val: node.val})
+    push(A,{type: 'Assignment', lv: { type: 'IdLvalue', id: node.d.id}, val: node.val}, node.d)
   },
 
   ReturnStatement: function* (node: any, context: Context) {
@@ -379,16 +388,16 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
   Block: function* (node: any, context: Context) {
     const locals: Array<Pair<string,string>> = scan(node.stmnts)
-    const unassignedList: Array<any> = locals.map(_ => unassigned)
+    const unDeclaredList: Array<any> = locals.map(_ => undeclared)
     if (!(A.length === 0)) {
       push(A, {type: 'Environment_i', env: E})
     }
     push(A, node.stmnts)
-    E = extendEnvironment(locals, unassignedList, E)
+    E = extendEnvironment(locals, unDeclaredList, E)
   },
 
   Dcl: function* (node: any, context: Context) {
-    throw new Error(`not supported yet: ${node.type}`)
+    assign(node.id.text, unassigned, E)
   },
 
   Predicate: function* (node: any, context: Context) {
