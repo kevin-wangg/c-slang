@@ -80,7 +80,7 @@ const peek = (array: Array<any>): any => array.slice(-1)[0]
 
 const isTypeMatch = (lval: string, val: any, type: string): boolean => {
   if (val == unassigned) {
-    return true;
+    return true
   } else if (type == 'StringType' && isString(val)) {
     return true
   } else if (type == 'BoolType' && isBoolean(val)) {
@@ -125,7 +125,8 @@ const lookup = (lval: string, env: Pair<any, any>): any => {
   }
   if (env[0].hasOwnProperty(lval)) {
     const v = env[0][lval][1]
-    if (isUnassigned(v) || isUndeclared(v)) throw new Error('Unassigned or undeclared name for ' + lval)
+    if (isUnassigned(v) || isUndeclared(v))
+      throw new Error('Unassigned or undeclared name for ' + lval)
     return v
   }
   return lookup(lval, env[1])
@@ -158,7 +159,7 @@ const isUnassigned = (v: any): boolean => {
 }
 
 const undeclared = { type: 'Undeclared' }
-const isUndeclared= (v: any): boolean => {
+const isUndeclared = (v: any): boolean => {
   return v !== null && typeof v === 'object' && v.hasOwnProperty('type') && v.type === 'Undeclared'
 }
 
