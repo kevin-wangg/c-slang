@@ -145,7 +145,7 @@ const extendEnvironment = (
         new_frame[lvals[i][0]] = pair(lvals[i][1], vals[i])
     }
 
-    return pair(new_frame, E)
+    return pair(new_frame, env)
 }
 
 const unassigned = { type: 'Unassigned' }
