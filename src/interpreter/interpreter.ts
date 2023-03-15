@@ -201,8 +201,7 @@ const heap_set = (addr: number, val: number) => {
     HEAP[addr] = val
 }
 
-const type_sizes = {
-}
+const type_sizes = {}
 
 // Interpreter configurations:
 // A: agenda: stack of commands
