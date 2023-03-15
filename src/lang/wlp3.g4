@@ -17,13 +17,10 @@ paramlist: first=dcl # SingleParam
 dcl: t=type id=ID;
 type: 'int' # IntType
     | 'bool' # BoolType
-    | 'string' # StringType
     | 'int*' # IntStarType
     | 'bool*' # BoolStarType
-    | 'string*' # StringStarType
     ;
 expr: INT # Int
-    | STRING # String
     | BOOL # Bool
     | '(' inner=expr ')' # Parentheses
 	| unop=unaryoperator first=expr # UnopExpr
@@ -75,6 +72,5 @@ lvalue: id=ID # IdLvalue
 
 WS      : [ \t\r\n]+ -> skip ;
 INT     : [0-9]+ ;
-STRING  : '"'[a-zA-Z0-9]+'"' ;
 BOOL    : 'true' | 'false';
 ID: [a-zA-Z_][a-zA-Z_0-9]* ;

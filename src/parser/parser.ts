@@ -62,8 +62,6 @@ import {
     StatementEmptyContext,
     StatementListContext,
     StatementlistContext,
-    StringContext,
-    StringTypeContext,
     TypeContext,
     UnaryoperatorContext,
     UnopExprContext,
@@ -232,11 +230,6 @@ class ProgramGenerator implements wlp3Visitor<any> {
             type: 'BoolType'
         }
     }
-    visitStringType(ctx: StringTypeContext): any {
-        return {
-            type: 'StringType'
-        }
-    }
     visitIntStarType(ctx: IntStarTypeContext): any {
         return {
             type: 'IntStarTypeContext'
@@ -348,12 +341,6 @@ class ProgramGenerator implements wlp3Visitor<any> {
         return {
             type: 'IntLiteral',
             val: parseInt(ctx.text)
-        }
-    }
-    visitString(ctx: StringContext): any {
-        return {
-            type: 'StringLiteral',
-            val: ctx.text
         }
     }
     visitBool(ctx: BoolContext): any {
