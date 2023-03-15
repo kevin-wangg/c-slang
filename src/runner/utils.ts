@@ -18,11 +18,11 @@ import { Context, Variant } from '../types'
  * @returns The variant that the program is to be run in
  */
 export function determineVariant(context: Context, options: Partial<IOptions>): Variant {
-  if (options.variant) {
-    return options.variant
-  } else {
-    return context.variant
-  }
+    if (options.variant) {
+        return options.variant
+    } else {
+        return context.variant
+    }
 }
 
 export const resolvedErrorPromise = Promise.resolve({ status: 'error' } as Result)

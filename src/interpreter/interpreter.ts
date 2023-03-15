@@ -9,71 +9,83 @@ import { evaluateBinaryExpression, evaluateUnaryExpression } from '../utils/oper
 import * as rttc from '../utils/rttc'
 
 class Thunk {
-  public value: Value
-  public isMemoized: boolean
-  constructor(public exp: es.Node, public env: Environment) {
-    this.isMemoized = false
-    this.value = null
-  }
+    public value: Value
+    public isMemoized: boolean
+    constructor(public exp: es.Node, public env: Environment) {
+        this.isMemoized = false
+        this.value = null
+    }
 }
 
 function* forceIt(val: any, context: Context): Value {
-  if (val instanceof Thunk) {
-    if (val.isMemoized) return val.value
+    if (val instanceof Thunk) {
+        if (val.isMemoized) return val.value
 
-    pushEnvironment(context, val.env)
-    const evalRes = yield* actualValue(val.exp, context)
-    popEnvironment(context)
-    val.value = evalRes
-    val.isMemoized = true
-    return evalRes
-  } else return val
+        pushEnvironment(context, val.env)
+        const evalRes = yield* actualValue(val.exp, context)
+        popEnvironment(context)
+        val.value = evalRes
+        val.isMemoized = true
+        return evalRes
+    } else return val
 }
 
 export function* actualValue(exp: es.Node, context: Context): Value {
-  const evalResult = yield* evaluate(exp, context)
-  const forced = yield* forceIt(evalResult, context)
-  return forced
+    const evalResult = yield* evaluate(exp, context)
+    const forced = yield* forceIt(evalResult, context)
+    return forced
 }
 
 const handleRuntimeError = (context: Context, error: RuntimeSourceError): never => {
-  context.errors.push(error)
-  context.runtime.environments = context.runtime.environments.slice(
-    -context.numberOfOuterEnvironments
-  )
-  throw error
+    context.errors.push(error)
+    context.runtime.environments = context.runtime.environments.slice(
+        -context.numberOfOuterEnvironments
+    )
+    throw error
 }
 
 function* visit(context: Context, node: es.Node) {
-  context.runtime.nodes.unshift(node)
-  yield context
+    context.runtime.nodes.unshift(node)
+    yield context
 }
 
 function* leave(context: Context) {
-  context.runtime.break = false
-  context.runtime.nodes.shift()
-  yield context
+    context.runtime.break = false
+    context.runtime.nodes.shift()
+    yield context
 }
 
 const popEnvironment = (context: Context) => context.runtime.environments.shift()
 export const pushEnvironment = (context: Context, environment: Environment) => {
-  context.runtime.environments.unshift(environment)
-  context.runtime.environmentTree.insert(environment)
+    context.runtime.environments.unshift(environment)
+    context.runtime.environmentTree.insert(environment)
 }
 
 export type Evaluator<T extends es.Node> = (node: T, context: Context) => IterableIterator<Value>
 
+const unassigned = { type: 'Unassigned' }
+const isUnassigned = (v: any): boolean => {
+    return (
+        v !== null && typeof v === 'object' && v.hasOwnProperty('type') && v.type === 'Unassigned'
+    )
+}
+
+const undeclared = { type: 'Undeclared' }
+const isUndeclared = (v: any): boolean => {
+  return v !== null && typeof v === 'object' && v.hasOwnProperty('type') && v.type === 'Undeclared'
+}
+
 function* evaluateBlockStatement(context: Context, node: es.BlockStatement) {
-  let result
-  for (const statement of node.body) {
-    result = yield* evaluate(statement, context)
-  }
-  return result
+    let result
+    for (const statement of node.body) {
+        result = yield* evaluate(statement, context)
+    }
+    return result
 }
 
 const push = (array: Array<any>, ...items: any): Array<any> => {
-  array.splice(array.length, 0, ...items)
-  return array
+    array.splice(array.length, 0, ...items)
+    return array
 }
 
 const peek = (array: Array<any>): any => array.slice(-1)[0]
@@ -94,29 +106,27 @@ const isTypeMatch = (lval: string, val: any, type: string): boolean => {
 const assign = (lval: string, val: any, env: Pair<any, any>): void => {
   if (env == null) throw new Error('unbound name: ' + lval)
   if (env[0].hasOwnProperty(lval) && !isUndeclared(lval)) {
-    const type = env[0][lval][0]
-    if (isTypeMatch(lval, val, type)) {
-      env[0][lval][1] = val
+      const type = env[0][lval][0]
+      if (isTypeMatch(lval, val, type)) {
+        env[0][lval][1] = val
+    } else if (isUndeclared(lval)) {
+      throw new Error('Assigning a value to an undeclared variable ' + lval)
     } else {
-      throw new Error('Type mismatch: ' + lval + ' is a ' + type)
+      assign(lval, val, env[1])
     }
-  } else if (isUndeclared(lval)) {
-    throw new Error('Assigning a value to an undeclared variable ' + lval)
-  } else {
-    assign(lval, val, env[1])
   }
 }
 
 const scan = (stmts: any): Array<Pair<string, string>> => {
-  const locals = []
-  while (stmts.type != 'StatementEmpty') {
-    const firstStatement = stmts.first
-    if (firstStatement.type == 'DclStatement' || firstStatement.type == 'DclAssignment') {
-      locals.push(pair(firstStatement.d.id.text, firstStatement.d.t.type))
+    const locals = []
+    while (stmts.type != 'StatementEmpty') {
+        const firstStatement = stmts.first
+        if (firstStatement.type == 'DclStatement' || firstStatement.type == 'DclAssignment') {
+            locals.push(pair(firstStatement.d.id.text, firstStatement.d.t.type))
+        }
+        stmts = stmts.rest
     }
-    stmts = stmts.rest
-  }
-  return locals
+    return locals
 }
 
 const lookup = (lval: string, env: Pair<any, any>): any => {
@@ -133,35 +143,26 @@ const lookup = (lval: string, env: Pair<any, any>): any => {
 }
 
 const extendEnvironment = (
-  lvals: Array<Pair<string, string>>,
-  vals: Array<any>,
-  env: Pair<any, any>
+    lvals: Array<Pair<string, string>>,
+    vals: Array<any>,
+    env: Pair<any, any>
 ): Pair<any, any> => {
-  if (lvals.length > vals.length) {
-    throw new Error('Too many arguments provided to extendEnvironment')
-  }
+    if (lvals.length > vals.length) {
+        throw new Error('Too many arguments provided to extendEnvironment')
+    }
 
-  if (lvals.length < vals.length) {
-    throw new Error('Too few arguments provided to extendEnvironment')
-  }
-  const new_frame = {}
+    if (lvals.length < vals.length) {
+        throw new Error('Too few arguments provided to extendEnvironment')
+    }
+    const new_frame = {}
 
-  for (let i = 0; i < lvals.length; i++) {
-    new_frame[lvals[i][0]] = pair(lvals[i][1], vals[i])
-  }
+    for (let i = 0; i < lvals.length; i++) {
+        new_frame[lvals[i][0]] = pair(lvals[i][1], vals[i])
+    }
 
-  return pair(new_frame, E)
+    return pair(new_frame, E)
 }
 
-const unassigned = { type: 'Unassigned' }
-const isUnassigned = (v: any): boolean => {
-  return v !== null && typeof v === 'object' && v.hasOwnProperty('type') && v.type === 'Unassigned'
-}
-
-const undeclared = { type: 'Undeclared' }
-const isUndeclared = (v: any): boolean => {
-  return v !== null && typeof v === 'object' && v.hasOwnProperty('type') && v.type === 'Undeclared'
-}
 
 // Interpreter configurations:
 // A: agenda: stack of commands
@@ -457,36 +458,36 @@ const global_environment = null
 const step_limit = 1000000
 
 export function* evaluate(node: es.Node, context: Context) {
-  A = []
-  A.push(node)
-  S = []
-  E = pair(global_frame, global_environment)
+    A = []
+    A.push(node)
+    S = []
+    E = pair(global_frame, global_environment)
 
-  let i = 0
-  while (i < step_limit) {
-    if (A.length === 0) {
-      break
+    let i = 0
+    while (i < step_limit) {
+        if (A.length === 0) {
+            break
+        }
+
+        // Debugging
+        console.log('PRINTING A')
+        console.log(A)
+        console.log('PRINTING S')
+        console.log(S)
+        console.log('PRINTING E')
+        console.log(E)
+
+        const cmd = A.pop()
+        yield* evaluators[cmd.type](cmd, context)
+        i++
     }
 
-    // Debugging
-    console.log('PRINTING A')
-    console.log(A)
-    console.log('PRINTING S')
-    console.log(S)
-    console.log('PRINTING E')
-    console.log(E)
-
-    const cmd = A.pop()
-    yield* evaluators[cmd.type](cmd, context)
-    i++
-  }
-
-  if (i === step_limit) {
-    throw new Error('step limit ' + step_limit + ' exceeded')
-  }
-  if (S.length > 1 || S.length < 1) {
-    throw new Error('internal error: stash must be singleton but is not')
-  }
-  yield* leave(context)
-  return S[0]
+    if (i === step_limit) {
+        throw new Error('step limit ' + step_limit + ' exceeded')
+    }
+    if (S.length > 1 || S.length < 1) {
+        throw new Error('internal error: stash must be singleton but is not')
+    }
+    yield* leave(context)
+    return S[0]
 }

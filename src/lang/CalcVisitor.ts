@@ -20,73 +20,73 @@ import { ExpressionContext } from './CalcParser'
  * operations with no return type.
  */
 export interface CalcVisitor<Result> extends ParseTreeVisitor<Result> {
-  /**
-   * Visit a parse tree produced by the `Number`
-   * labeled alternative in `CalcParser.expression`.
-   * @param ctx the parse tree
-   * @return the visitor result
-   */
-  visitNumber?: (ctx: NumberContext) => Result
+    /**
+     * Visit a parse tree produced by the `Number`
+     * labeled alternative in `CalcParser.expression`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitNumber?: (ctx: NumberContext) => Result
 
-  /**
-   * Visit a parse tree produced by the `Parentheses`
-   * labeled alternative in `CalcParser.expression`.
-   * @param ctx the parse tree
-   * @return the visitor result
-   */
-  visitParentheses?: (ctx: ParenthesesContext) => Result
+    /**
+     * Visit a parse tree produced by the `Parentheses`
+     * labeled alternative in `CalcParser.expression`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitParentheses?: (ctx: ParenthesesContext) => Result
 
-  /**
-   * Visit a parse tree produced by the `Power`
-   * labeled alternative in `CalcParser.expression`.
-   * @param ctx the parse tree
-   * @return the visitor result
-   */
-  visitPower?: (ctx: PowerContext) => Result
+    /**
+     * Visit a parse tree produced by the `Power`
+     * labeled alternative in `CalcParser.expression`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitPower?: (ctx: PowerContext) => Result
 
-  /**
-   * Visit a parse tree produced by the `Multiplication`
-   * labeled alternative in `CalcParser.expression`.
-   * @param ctx the parse tree
-   * @return the visitor result
-   */
-  visitMultiplication?: (ctx: MultiplicationContext) => Result
+    /**
+     * Visit a parse tree produced by the `Multiplication`
+     * labeled alternative in `CalcParser.expression`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitMultiplication?: (ctx: MultiplicationContext) => Result
 
-  /**
-   * Visit a parse tree produced by the `Division`
-   * labeled alternative in `CalcParser.expression`.
-   * @param ctx the parse tree
-   * @return the visitor result
-   */
-  visitDivision?: (ctx: DivisionContext) => Result
+    /**
+     * Visit a parse tree produced by the `Division`
+     * labeled alternative in `CalcParser.expression`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitDivision?: (ctx: DivisionContext) => Result
 
-  /**
-   * Visit a parse tree produced by the `Addition`
-   * labeled alternative in `CalcParser.expression`.
-   * @param ctx the parse tree
-   * @return the visitor result
-   */
-  visitAddition?: (ctx: AdditionContext) => Result
+    /**
+     * Visit a parse tree produced by the `Addition`
+     * labeled alternative in `CalcParser.expression`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitAddition?: (ctx: AdditionContext) => Result
 
-  /**
-   * Visit a parse tree produced by the `Subtraction`
-   * labeled alternative in `CalcParser.expression`.
-   * @param ctx the parse tree
-   * @return the visitor result
-   */
-  visitSubtraction?: (ctx: SubtractionContext) => Result
+    /**
+     * Visit a parse tree produced by the `Subtraction`
+     * labeled alternative in `CalcParser.expression`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitSubtraction?: (ctx: SubtractionContext) => Result
 
-  /**
-   * Visit a parse tree produced by `CalcParser.start`.
-   * @param ctx the parse tree
-   * @return the visitor result
-   */
-  visitStart?: (ctx: StartContext) => Result
+    /**
+     * Visit a parse tree produced by `CalcParser.start`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitStart?: (ctx: StartContext) => Result
 
-  /**
-   * Visit a parse tree produced by `CalcParser.expression`.
-   * @param ctx the parse tree
-   * @return the visitor result
-   */
-  visitExpression?: (ctx: ExpressionContext) => Result
+    /**
+     * Visit a parse tree produced by `CalcParser.expression`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitExpression?: (ctx: ExpressionContext) => Result
 }

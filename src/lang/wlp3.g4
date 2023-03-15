@@ -19,6 +19,8 @@ type: 'int' # IntType
     | 'bool' # BoolType
     | 'string' # StringType
     | 'int*' # IntStarType
+    | 'bool*' # BoolStarType
+    | 'string*' # StringStarType
     ;
 expr: INT # Int
     | STRING # String
@@ -68,6 +70,7 @@ unaryoperator: '!';
 predicate: pred=expr;
 lvalue: id=ID # IdLvalue
   | '(' lv=lvalue ')' # BracketLvalue
+  | '*' addr=expr # DerefAddress
   ;
 
 WS      : [ \t\r\n]+ -> skip ;

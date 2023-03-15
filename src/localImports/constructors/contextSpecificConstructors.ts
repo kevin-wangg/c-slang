@@ -2,11 +2,11 @@ import es from 'estree'
 
 import { accessExportFunctionName } from '../../stdlib/localImport.prelude'
 import {
-  createCallExpression,
-  createIdentifier,
-  createLiteral,
-  createVariableDeclaration,
-  createVariableDeclarator
+    createCallExpression,
+    createIdentifier,
+    createLiteral,
+    createVariableDeclaration,
+    createVariableDeclarator
 } from './baseConstructors'
 
 /**
@@ -16,10 +16,10 @@ import {
  * @param tail The tail of the pair.
  */
 export const createPairCallExpression = (
-  head: es.Expression | es.SpreadElement,
-  tail: es.Expression | es.SpreadElement
+    head: es.Expression | es.SpreadElement,
+    tail: es.Expression | es.SpreadElement
 ): es.SimpleCallExpression => {
-  return createCallExpression('pair', [head, tail])
+    return createCallExpression('pair', [head, tail])
 }
 
 /**
@@ -28,9 +28,9 @@ export const createPairCallExpression = (
  * @param listElements The elements of the list.
  */
 export const createListCallExpression = (
-  listElements: Array<es.Expression | es.SpreadElement>
+    listElements: Array<es.Expression | es.SpreadElement>
 ): es.SimpleCallExpression => {
-  return createCallExpression('list', listElements)
+    return createCallExpression('list', listElements)
 }
 
 /**
@@ -42,16 +42,16 @@ export const createListCallExpression = (
  * @param lookupName   The name to lookup in the transformed function declaration.
  */
 export const createImportedNameDeclaration = (
-  functionName: string,
-  importedName: es.Identifier,
-  lookupName: string
+    functionName: string,
+    importedName: es.Identifier,
+    lookupName: string
 ): es.VariableDeclaration => {
-  const callExpression = createCallExpression(accessExportFunctionName, [
-    createIdentifier(functionName),
-    createLiteral(lookupName)
-  ])
-  const variableDeclarator = createVariableDeclarator(importedName, callExpression)
-  return createVariableDeclaration([variableDeclarator], 'const')
+    const callExpression = createCallExpression(accessExportFunctionName, [
+        createIdentifier(functionName),
+        createLiteral(lookupName)
+    ])
+    const variableDeclarator = createVariableDeclarator(importedName, callExpression)
+    return createVariableDeclaration([variableDeclarator], 'const')
 }
 
 /**
@@ -63,16 +63,16 @@ export const createImportedNameDeclaration = (
  * @param functionArgs The arguments to be passed when invoking the function.
  */
 export const createInvokedFunctionResultVariableDeclaration = (
-  functionName: string,
-  variableName: string,
-  functionArgs: es.Identifier[]
+    functionName: string,
+    variableName: string,
+    functionArgs: es.Identifier[]
 ): es.VariableDeclaration => {
-  const callExpression = createCallExpression(functionName, functionArgs)
-  const variableDeclarator = createVariableDeclarator(
-    createIdentifier(variableName),
-    callExpression
-  )
-  return createVariableDeclaration([variableDeclarator], 'const')
+    const callExpression = createCallExpression(functionName, functionArgs)
+    const variableDeclarator = createVariableDeclarator(
+        createIdentifier(variableName),
+        callExpression
+    )
+    return createVariableDeclaration([variableDeclarator], 'const')
 }
 
 /**
@@ -85,24 +85,24 @@ export const createInvokedFunctionResultVariableDeclaration = (
  * @param importSpecifier The import specifier to be cloned.
  */
 export const cloneAndStripImportSpecifier = (
-  importSpecifier: es.ImportSpecifier | es.ImportDefaultSpecifier | es.ImportNamespaceSpecifier
+    importSpecifier: es.ImportSpecifier | es.ImportDefaultSpecifier | es.ImportNamespaceSpecifier
 ): es.ImportSpecifier | es.ImportDefaultSpecifier | es.ImportNamespaceSpecifier => {
-  switch (importSpecifier.type) {
-    case 'ImportSpecifier':
-      return {
-        type: 'ImportSpecifier',
-        local: createIdentifier(importSpecifier.local.name),
-        imported: createIdentifier(importSpecifier.imported.name)
-      }
-    case 'ImportDefaultSpecifier':
-      return {
-        type: 'ImportDefaultSpecifier',
-        local: createIdentifier(importSpecifier.local.name)
-      }
-    case 'ImportNamespaceSpecifier':
-      return {
-        type: 'ImportNamespaceSpecifier',
-        local: createIdentifier(importSpecifier.local.name)
-      }
-  }
+    switch (importSpecifier.type) {
+        case 'ImportSpecifier':
+            return {
+                type: 'ImportSpecifier',
+                local: createIdentifier(importSpecifier.local.name),
+                imported: createIdentifier(importSpecifier.imported.name)
+            }
+        case 'ImportDefaultSpecifier':
+            return {
+                type: 'ImportDefaultSpecifier',
+                local: createIdentifier(importSpecifier.local.name)
+            }
+        case 'ImportNamespaceSpecifier':
+            return {
+                type: 'ImportNamespaceSpecifier',
+                local: createIdentifier(importSpecifier.local.name)
+            }
+    }
 }
