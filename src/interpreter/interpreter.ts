@@ -215,243 +215,243 @@ let E: Pair<any, any>
 // tslint:disable:object-literal-shorthand
 // prettier-ignore
 export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
-  StatementList: function* (node: any, context: Context) {
-      push(A, node.rest, node.first)
-  },
+    StatementList: function* (node: any, context: Context) {
+        push(A, node.rest, node.first)
+    },
 
-  StatementEmpty: function* (node: any, context: Context) {
-      // Do Nothing
-  },
+    StatementEmpty: function* (node: any, context: Context) {
+        // Do Nothing
+    },
 
-  SingleParam: function* (node: any, context: Context) {
-     throw new Error(`not supported yet: ${node.type}`)
-  },
-
-  MultiParam: function* (node: any, context: Context) {
+    SingleParam: function* (node: any, context: Context) {
       throw new Error(`not supported yet: ${node.type}`)
-  },
+    },
 
-  FunProg: function* (node: any, context: Context) {
-      throw new Error(`not supported yet: ${node.type}`)
-  },
+    MultiParam: function* (node: any, context: Context) {
+        throw new Error(`not supported yet: ${node.type}`)
+    },
 
-  Lambda: function* (node: any, context: Context) {
-      throw new Error(`not supported yet: ${node.type}`)
-  },
+    FunProg: function* (node: any, context: Context) {
+        throw new Error(`not supported yet: ${node.type}`)
+    },
 
-  MainProg: function* (node: any, context: Context) {
-      push(A, node.mn.blk)
-  },
+    Lambda: function* (node: any, context: Context) {
+        throw new Error(`not supported yet: ${node.type}`)
+    },
 
-  ParamsList: function* (node: any, context: Context) {
-      throw new Error(`not supported yet: ${node.type}`)
-  },
+    MainProg: function* (node: any, context: Context) {
+        push(A, node.mn.blk)
+    },
 
-  ParamsEmpty: function* (node: any, context: Context) {
-      throw new Error(`not supported yet: ${node.type}`)
-  },
+    ParamsList: function* (node: any, context: Context) {
+        throw new Error(`not supported yet: ${node.type}`)
+    },
 
-  IntType: function* (node: any, context: Context) {
-      // Do Nothing
-  },
+    ParamsEmpty: function* (node: any, context: Context) {
+        throw new Error(`not supported yet: ${node.type}`)
+    },
 
-  BoolType: function* (node: any, context: Context) {
-      // Do Nothing
-  },
+    IntType: function* (node: any, context: Context) {
+        // Do Nothing
+    },
 
-  StringType: function* (node: any, context: Context) {
-      // Do Nothing
-  },
+    BoolType: function* (node: any, context: Context) {
+        // Do Nothing
+    },
 
-  IntStarType: function* (node: any, context: Context) {
-      // Do Nothing
-  },
+    StringType: function* (node: any, context: Context) {
+        // Do Nothing
+    },
 
-  ArgsList: function* (node: any, context: Context) {
-      throw new Error(`not supported yet: ${node.type}`)
-  },
+    IntStarType: function* (node: any, context: Context) {
+        // Do Nothing
+    },
 
-  ArgsEmpty: function* (node: any, context: Context) {
-      throw new Error(`not supported yet: ${node.type}`)
-  },
+    ArgsList: function* (node: any, context: Context) {
+        throw new Error(`not supported yet: ${node.type}`)
+    },
 
-  IdLvalue: function* (node: any, context: Context) {
-      throw new Error(`not supported yet: ${node.type}`)
-  },
+    ArgsEmpty: function* (node: any, context: Context) {
+        throw new Error(`not supported yet: ${node.type}`)
+    },
 
-  BracketLvalue: function* (node: any, context: Context) {
-      throw new Error(`not supported yet: ${node.type}`)
-  },
+    IdLvalue: function* (node: any, context: Context) {
+        throw new Error(`not supported yet: ${node.type}`)
+    },
 
-  SingleArg: function* (node: any, context: Context) {
-      throw new Error(`not supported yet: ${node.type}`)
-  },
+    BracketLvalue: function* (node: any, context: Context) {
+        throw new Error(`not supported yet: ${node.type}`)
+    },
 
-  MultiArgs: function* (node: any, context: Context) {
-      throw new Error(`not supported yet: ${node.type}`)
-  },
+    SingleArg: function* (node: any, context: Context) {
+        throw new Error(`not supported yet: ${node.type}`)
+    },
 
-  Assignment: function* (node: any, context: Context) {
-      push(A, {type:'Assignment_i', sym: node.lv}, node.val)
-  },
+    MultiArgs: function* (node: any, context: Context) {
+        throw new Error(`not supported yet: ${node.type}`)
+    },
 
-  IfStatement: function* (node: any, context: Context) {
-      push(A, {type: 'Branch_i', cons: node.cons, alt: node.alt}, node.pred)
-  },
+    Assignment: function* (node: any, context: Context) {
+        push(A, {type:'Assignment_i', sym: node.lv}, node.val)
+    },
 
-  WhileStatement: function* (node: any, context: Context) {
-      throw new Error(`not supported yet: ${node.type}`)
-  },
+    IfStatement: function* (node: any, context: Context) {
+        push(A, {type: 'Branch_i', cons: node.cons, alt: node.alt}, node.pred)
+    },
 
-  PrintfStatement: function* (node: any, context: Context) {
-      throw new Error(`not supported yet: ${node.type}`)
-  },
+    WhileStatement: function* (node: any, context: Context) {
+        throw new Error(`not supported yet: ${node.type}`)
+    },
 
-  DclStatement: function* (node: any, context: Context) {
-    push(A, node.d)
-  },
+    PrintfStatement: function* (node: any, context: Context) {
+        throw new Error(`not supported yet: ${node.type}`)
+    },
 
-  DclAssignment: function* (node: any, context: Context) {
-    push(A,{type: 'Assignment', lv: { type: 'IdLvalue', id: node.d.id}, val: node.val}, node.d)
-  },
+    DclStatement: function* (node: any, context: Context) {
+      push(A, node.d)
+    },
 
-  ReturnStatement: function* (node: any, context: Context) {
-      // TODO: Implement properly with functions
-      push(A, node.val)
-  },
+    DclAssignment: function* (node: any, context: Context) {
+      push(A,{type: 'Assignment', lv: { type: 'IdLvalue', id: node.d.id}, val: node.val}, node.d)
+    },
 
-  FreeStatement: function* (node: any, context: Context) {
-      throw new Error(`not supported yet: ${node.type}`)
-  },
+    ReturnStatement: function* (node: any, context: Context) {
+        // TODO: Implement properly with functions
+        push(A, node.val)
+    },
 
-  ExprStatement: function* (node: any, context: Context) {
-      push(A, { type: 'Pop_i' }, node.val)
-  },
+    FreeStatement: function* (node: any, context: Context) {
+        throw new Error(`not supported yet: ${node.type}`)
+    },
 
-  Parentheses: function* (node: any, context: Context) {
-      push(A, node.val)
-  },
+    ExprStatement: function* (node: any, context: Context) {
+        push(A, { type: 'Pop_i' }, node.val)
+    },
 
-  IntLiteral: function* (node: any, context: Context) {
-      push(S, node.val)
-  },
+    Parentheses: function* (node: any, context: Context) {
+        push(A, node.val)
+    },
 
-  StringLiteral: function* (node: any, context: Context) {
-      push(S, node.val)
-  },
+    IntLiteral: function* (node: any, context: Context) {
+        push(S, node.val)
+    },
 
-  BoolLiteral: function* (node: any, context: Context) {
-      push(S, node.val)
-  },
+    StringLiteral: function* (node: any, context: Context) {
+        push(S, node.val)
+    },
 
-  UnopExpr: function* (node: any, context: Context) {
-      push(A, {type: "UnopExpr_i", sym: node.unop}, node.first)
-  },
+    BoolLiteral: function* (node: any, context: Context) {
+        push(S, node.val)
+    },
 
-  BinopExpr: function* (node: any, context: Context) {
-      push(A, {type: "BinopExpr_i", sym: node.binop}, node.second, node.first)
-  },
+    UnopExpr: function* (node: any, context: Context) {
+        push(A, {type: "UnopExpr_i", sym: node.unop}, node.first)
+    },
 
-  BinlogExpr: function* (node: any, context: Context) {
-      push(A, {type: "BinlogExpr_i", sym: node.binlog}, node.second, node.first)
-  },
+    BinopExpr: function* (node: any, context: Context) {
+        push(A, {type: "BinopExpr_i", sym: node.binop}, node.second, node.first)
+    },
 
-  IdExpr: function* (node: any, context: Context) {
-      push(S, lookup(node.id.text, E))
-  },
+    BinlogExpr: function* (node: any, context: Context) {
+        push(A, {type: "BinlogExpr_i", sym: node.binlog}, node.second, node.first)
+    },
 
-  FnExpr: function* (node: any, context: Context) {
-      throw new Error(`not supported yet: ${node.type}`)
-  },
+    IdExpr: function* (node: any, context: Context) {
+        push(S, lookup(node.id.text, E))
+    },
 
-  MallocExpr: function* (node: any, context: Context) {
-      throw new Error(`not supported yet: ${node.type}`)
-  },
+    FnExpr: function* (node: any, context: Context) {
+        throw new Error(`not supported yet: ${node.type}`)
+    },
 
-  StarExpr: function* (node: any, context: Context) {
-      throw new Error(`not supported yet: ${node.type}`)
-  },
+    MallocExpr: function* (node: any, context: Context) {
+        throw new Error(`not supported yet: ${node.type}`)
+    },
 
-  AmpersandExpr: function* (node: any, context: Context) {
-      throw new Error(`not supported yet: ${node.type}`)
-  },
+    StarExpr: function* (node: any, context: Context) {
+        throw new Error(`not supported yet: ${node.type}`)
+    },
 
-  Program: function* (node: any, context: Context) {
-      throw new Error(`not supported yet: ${node.type}`)
-  },
+    AmpersandExpr: function* (node: any, context: Context) {
+        throw new Error(`not supported yet: ${node.type}`)
+    },
 
-  Main: function* (node: any, context: Context) {
-      throw new Error(`not supported yet: ${node.type}`)
-  },
+    Program: function* (node: any, context: Context) {
+        throw new Error(`not supported yet: ${node.type}`)
+    },
 
-  Function: function* (node: any, context: Context) {
-      throw new Error(`not supported yet: ${node.type}`)
-  },
+    Main: function* (node: any, context: Context) {
+        throw new Error(`not supported yet: ${node.type}`)
+    },
 
-  Block: function* (node: any, context: Context) {
-      const locals: Array<Pair<string,string>> = scan(node.stmnts)
-      const unassignedList: Array<any> = locals.map(_ => unassigned)
-      if (!(A.length === 0)) {
-          push(A, {type: 'Environment_i', env: E})
-      }
-      push(A, node.stmnts)
-      E = extendEnvironment(locals, unassignedList, E)
-  },
+    Function: function* (node: any, context: Context) {
+        throw new Error(`not supported yet: ${node.type}`)
+    },
 
-  Dcl: function* (node: any, context: Context) {
-    assign(node.id.text, unassigned, E)
-  },
+    Block: function* (node: any, context: Context) {
+        const locals: Array<Pair<string,string>> = scan(node.stmnts)
+        const unassignedList: Array<any> = locals.map(_ => unassigned)
+        if (!(A.length === 0)) {
+            push(A, {type: 'Environment_i', env: E})
+        }
+        push(A, node.stmnts)
+        E = extendEnvironment(locals, unassignedList, E)
+    },
 
-  Predicate: function* (node: any, context: Context) {
-      push(A, node.pred)
-  },
+    Dcl: function* (node: any, context: Context) {
+      assign(node.id.text, unassigned, E)
+    },
 
-  // Instructions
-  UnopExpr_i: function* (node: any, context: Context) {
-      const value = S.pop()
-      const error = rttc.checkUnaryExpression(node, node.sym, value)
-      if (error) {
-          handleRuntimeError(context, error)
-      }
-      push(S, evaluateUnaryExpression(node.sym, value))
-  },
+    Predicate: function* (node: any, context: Context) {
+        push(A, node.pred)
+    },
 
-  BinopExpr_i: function* (node: any, context: Context) {
-      const leftValue = S.pop()
-      const rightValue = S.pop()
-      const error = rttc.checkBinaryExpression(node, node.sym, leftValue, rightValue)
-      if (error) {
-          handleRuntimeError(context, error)
-      }
-      push(S, evaluateBinaryExpression(node.sym.children[0].text, leftValue, rightValue))
-  },
+    // Instructions
+    UnopExpr_i: function* (node: any, context: Context) {
+        const value = S.pop()
+        const error = rttc.checkUnaryExpression(node, node.sym, value)
+        if (error) {
+            handleRuntimeError(context, error)
+        }
+        push(S, evaluateUnaryExpression(node.sym, value))
+    },
 
-  BinlogExpr_i: function* (node: any, context: Context) {
-      const leftValue = S.pop()
-      const rightValue = S.pop()
-      const error = rttc.checkBinaryExpression(node, node.sym, leftValue, rightValue)
-      if (error) {
-          handleRuntimeError(context, error)
-      }
+    BinopExpr_i: function* (node: any, context: Context) {
+        const leftValue = S.pop()
+        const rightValue = S.pop()
+        const error = rttc.checkBinaryExpression(node, node.sym, leftValue, rightValue)
+        if (error) {
+            handleRuntimeError(context, error)
+        }
+        push(S, evaluateBinaryExpression(node.sym.children[0].text, leftValue, rightValue))
+    },
 
-      push(S, evaluateBinaryExpression(node.sym.children[0].text, leftValue, rightValue))
-  },
+    BinlogExpr_i: function* (node: any, context: Context) {
+        const leftValue = S.pop()
+        const rightValue = S.pop()
+        const error = rttc.checkBinaryExpression(node, node.sym, leftValue, rightValue)
+        if (error) {
+            handleRuntimeError(context, error)
+        }
 
-  Assignment_i: function* (node: any, context: Context) {
-      assign(node.sym.id.text, S.pop(), E)
-  },
+        push(S, evaluateBinaryExpression(node.sym.children[0].text, leftValue, rightValue))
+    },
 
-  Environment_i: function* (node: any, context: Context) {
-      E = node.env
-  },
+    Assignment_i: function* (node: any, context: Context) {
+        assign(node.sym.id.text, S.pop(), E)
+    },
 
-  Branch_i: function* (node: any, context: Context) {
-      push(A, S.pop() ? node.cons: node.alt)
-  },
+    Environment_i: function* (node: any, context: Context) {
+        E = node.env
+    },
 
-  Pop_i: function* (node: any, context: Context) {
-      S.pop()
-  },
+    Branch_i: function* (node: any, context: Context) {
+        push(A, S.pop() ? node.cons: node.alt)
+    },
+
+    Pop_i: function* (node: any, context: Context) {
+        S.pop()
+    },
 }
 // tslint:enable:object-literal-shorthand
 
