@@ -123,25 +123,22 @@ const assign = (lval: string, val: number, env: Pair<any, any>): void => {
 
 const heap_assign = (type: string, val: any, env_addr: number) => {
     // console.log(`HEAP ASSIGN ${type} ${val} ${env_addr}`)
-    if(isTypeMatch(val, type)) {
-        if(isNumber(val)) {
+    if (isTypeMatch(val, type)) {
+        if (isNumber(val)) {
             heap_set_int(env_addr, val)
-        }
-        else {
+        } else {
             throw new Error('Variable type in heap not yet supported')
         }
-    }
-    else {
+    } else {
         throw new Error(`Type mismatch: ${type} ${val}`)
     }
 }
 
 const heap_lookup = (type: string, env_addr: number) => {
     // console.log(`HEAP LOOKUP ${type} ${env_addr}`)
-    if(type == 'IntType') {
-        return heap_get_int(env_addr) 
-    }    
-    else {
+    if (type == 'IntType') {
+        return heap_get_int(env_addr)
+    } else {
         throw new Error(`${type} lookup in heap not yet supported`)
     }
 }
@@ -240,34 +237,34 @@ const heap_set = (addr: number, val: number) => {
 }
 
 const heap_get_int = (addr: number) => {
-    let first_byte = heap_get(addr)
-    let second_byte = heap_get(addr + 1)
-    let third_byte = heap_get(addr + 2)
-    let fourth_byte = heap_get(addr + 3)
+    const first_byte = heap_get(addr)
+    const second_byte = heap_get(addr + 1)
+    const third_byte = heap_get(addr + 2)
+    const fourth_byte = heap_get(addr + 3)
     return (first_byte << 24) | (second_byte << 16) | (third_byte << 8) | fourth_byte
 }
 
 const heap_set_int = (addr: number, num: number) => {
-    heap_set(addr, get_int_first_byte(num)) 
-    heap_set(addr + 1, get_int_second_byte(num)) 
-    heap_set(addr + 2, get_int_third_byte(num)) 
-    heap_set(addr + 3, get_int_fourth_byte(num)) 
+    heap_set(addr, get_int_first_byte(num))
+    heap_set(addr + 1, get_int_second_byte(num))
+    heap_set(addr + 2, get_int_third_byte(num))
+    heap_set(addr + 3, get_int_fourth_byte(num))
 }
 
 const get_int_first_byte = (num: number) => {
-    return (num & 0xFF000000) >> 24
+    return (num & 0xff000000) >> 24
 }
 
 const get_int_second_byte = (num: number) => {
-    return (num & 0x00FF0000) >> 16
+    return (num & 0x00ff0000) >> 16
 }
 
 const get_int_third_byte = (num: number) => {
-    return (num & 0x0000FF00) >> 8
+    return (num & 0x0000ff00) >> 8
 }
 
 const get_int_fourth_byte = (num: number) => {
-    return num & 0x000000FF
+    return num & 0x000000ff
 }
 
 const type_sizes = {
@@ -477,11 +474,11 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     IdExpr: function* (node: any, context: Context) {
-        let [type, addr] = lookup(node.id.text, E)
+        const [type, addr] = lookup(node.id.text, E)
         if(isUndeclared(addr)) {
             throw new Error(`Lookup of undeclared variable ${node.id.text}`)
         }
-        let val = heap_lookup(type, addr)
+        const val = heap_lookup(type, addr)
         push(S, val)
     },
 
@@ -544,7 +541,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
     AmperSandExpr_i: function* (node: any, context: Context) {
         const expr = S.pop()
-        let [type, addr] = lookup()
+        const [type, addr] = lookup()
         // need to change grammar so ampersand to lvalue
     },
 
@@ -579,14 +576,14 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     Assignment_i: function* (node: any, context: Context) {
-        let [type, addr] = lookup(node.sym.id.text, E)
+        const [type, addr] = lookup(node.sym.id.text, E)
         if(isUndeclared(addr)) {
             throw new Error('Assignment to undeclared variable')
         }
         if(!isNumber(addr)) {
             throw new Error('Invalid variable value. Should be address')
         }
-        let new_val = S.pop()
+        const new_val = S.pop()
         heap_assign(type, new_val, addr)
     },
 
