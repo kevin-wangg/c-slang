@@ -171,27 +171,26 @@ const initialize_machine = (heapsize_bytes: number) => {
 }
 
 const heap_allocate = (bytes: number) => {
-    let i = 0;
-    while(i < heap_size) {
-        if(HEAP[i] == 0) {
+    let i = 0
+    while (i < heap_size) {
+        if (HEAP[i] == 0) {
             let ok = true
-            for(let j = i; j <= i + bytes; ++j) {
-                if(HEAP[j] != 0) {
-                    ok = false;
-                    break;
+            for (let j = i; j <= i + bytes; ++j) {
+                if (HEAP[j] != 0) {
+                    ok = false
+                    break
                 }
             }
-            if(ok) {
+            if (ok) {
                 HEAP[i] = bytes
-                return i + 1;
+                return i + 1
             }
-            i++;
-        }
-        else {
-            i += HEAP[i] + 1;
+            i++
+        } else {
+            i += HEAP[i] + 1
         }
     }
-    return -1;
+    return -1
 }
 
 const heap_get = (addr: number) => {
@@ -199,7 +198,7 @@ const heap_get = (addr: number) => {
 }
 
 const heap_set = (addr: number, val: number) => {
-    HEAP[addr] = val 
+    HEAP[addr] = val
 }
 
 // Interpreter configurations:
@@ -510,7 +509,7 @@ export function* evaluate(node: es.Node, context: Context) {
     S = []
     E = pair(global_frame, global_environment)
 
-    initialize_machine(10000); // start program with 10000 bytes of memory
+    initialize_machine(10000) // start program with 10000 bytes of memory
 
     let i = 0
     while (i < step_limit) {
