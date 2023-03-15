@@ -14,10 +14,13 @@ import { IntTypeContext } from './wlp3Parser'
 import { BoolTypeContext } from './wlp3Parser'
 import { StringTypeContext } from './wlp3Parser'
 import { IntStarTypeContext } from './wlp3Parser'
+import { BoolStarTypeContext } from './wlp3Parser'
+import { StringStarTypeContext } from './wlp3Parser'
 import { ArgsListContext } from './wlp3Parser'
 import { ArgsEmptyContext } from './wlp3Parser'
 import { IdLvalueContext } from './wlp3Parser'
 import { BracketLvalueContext } from './wlp3Parser'
+import { DerefAddressContext } from './wlp3Parser'
 import { SingleArgContext } from './wlp3Parser'
 import { MultiArgsContext } from './wlp3Parser'
 import { AssignmentContext } from './wlp3Parser'
@@ -165,6 +168,22 @@ export interface wlp3Visitor<Result> extends ParseTreeVisitor<Result> {
     visitIntStarType?: (ctx: IntStarTypeContext) => Result
 
     /**
+     * Visit a parse tree produced by the `BoolStarType`
+     * labeled alternative in `wlp3Parser.type`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitBoolStarType?: (ctx: BoolStarTypeContext) => Result
+
+    /**
+     * Visit a parse tree produced by the `StringStarType`
+     * labeled alternative in `wlp3Parser.type`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitStringStarType?: (ctx: StringStarTypeContext) => Result
+
+    /**
      * Visit a parse tree produced by the `ArgsList`
      * labeled alternative in `wlp3Parser.args`.
      * @param ctx the parse tree
@@ -195,6 +214,14 @@ export interface wlp3Visitor<Result> extends ParseTreeVisitor<Result> {
      * @return the visitor result
      */
     visitBracketLvalue?: (ctx: BracketLvalueContext) => Result
+
+    /**
+     * Visit a parse tree produced by the `DerefAddress`
+     * labeled alternative in `wlp3Parser.lvalue`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitDerefAddress?: (ctx: DerefAddressContext) => Result
 
     /**
      * Visit a parse tree produced by the `SingleArg`
