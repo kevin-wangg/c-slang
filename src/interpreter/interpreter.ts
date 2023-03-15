@@ -145,7 +145,7 @@ const extendEnvironment = (
         new_frame[lvals[i][0]] = pair(lvals[i][1], vals[i])
     }
 
-    return pair(new_frame, E)
+    return pair(new_frame, env)
 }
 
 const unassigned = { type: 'Unassigned' }
@@ -290,7 +290,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     WhileStatement: function* (node: any, context: Context) {
-        throw new Error(`not supported yet: ${node.type}`)
+        push(A, {type: 'While_i', pred: node.pred, body: node.body}, node.pred)
     },
 
     PrintfStatement: function* (node: any, context: Context) {
@@ -339,11 +339,11 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     BinopExpr: function* (node: any, context: Context) {
-        push(A, {type: "BinopExpr_i", sym: node.binop}, node.second, node.first)
+        push(A, {type: "BinopExpr_i", sym: node.binop}, node.first, node.second)
     },
 
     BinlogExpr: function* (node: any, context: Context) {
-        push(A, {type: "BinlogExpr_i", sym: node.binlog}, node.second, node.first)
+        push(A, {type: "BinlogExpr_i", sym: node.binlog}, node.first, node.second)
     },
 
     IdExpr: function* (node: any, context: Context) {
@@ -441,6 +441,12 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
     Pop_i: function* (node: any, context: Context) {
         S.pop()
+    },
+
+    While_i: function* (node: any, context: Context) {
+        if(S.pop()){
+            push(A, node, node.pred, node.body)
+        }
     },
 }
 // tslint:enable:object-literal-shorthand
