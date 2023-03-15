@@ -201,6 +201,9 @@ const heap_set = (addr: number, val: number) => {
     HEAP[addr] = val
 }
 
+const type_sizes = {
+}
+
 // Interpreter configurations:
 // A: agenda: stack of commands
 // S: stash: stack of values
@@ -426,7 +429,10 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
     Block: function* (node: any, context: Context) {
         const locals: Array<Pair<string,string>> = scan(node.stmnts)
-        const unassignedList: Array<any> = locals.map(_ => unassigned)
+        const unassignedList: Array<any> = locals.map(_ => {
+            console.log(locals)
+            return unassigned
+        })
         if (!(A.length === 0)) {
             push(A, {type: 'Environment_i', env: E})
         }
