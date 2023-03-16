@@ -123,10 +123,6 @@ const isStringFunc = (val: any): boolean => {
 }
 
 const isTypeMatch = (lval: string, val: any, type: string): boolean => {
-    console.log('IN ISTYPEMATCH')
-    console.log(lval)
-    console.log(val)
-    console.log(type)
     return (
         val == unassigned ||
         (type == 'StringType' && isString(val)) ||
@@ -278,10 +274,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     FunProg: function* (node: any, context: Context) {
-      console.log("in FunProg")
       const functionDefinitions: Array<Pair<string,string>> = scanProg(node)
-      console.log('Function defintions')
-      console.log(functionDefinitions)
       for (let i = 0; i < functionDefinitions.length; i++) {
           E[0][functionDefinitions[i][1]] = pair(functionDefinitions[i][0], undeclared)
       }
@@ -369,12 +362,12 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     DclAssignment: function* (node: any, context: Context) {
-        push(A,{type: 'Assignment', lv: { type: 'IdLvalue', id: node.d.id}, val: node.val}, node.d)
+        push(A,{ type: 'Assignment', lv: { type: 'IdLvalue', id: node.d.id}, val: node.val}, node.d)
     },
 
     ReturnStatement: function* (node: any, context: Context) {
         // TODO: Implement properly with functions
-        push(A, node.val)
+        push(A, { type: 'Reset_i'}, node.val)
     },
 
     FreeStatement: function* (node: any, context: Context) {
@@ -418,7 +411,9 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     FnExpr: function* (node: any, context: Context) {
-        throw new Error(`not supported yet: ${node.type}`)
+        // TODO: Implement parameter handling
+        push(A, {type: "FnExpr_i"})
+        push(S, lookup(node.id.text, E))
     },
 
     MallocExpr: function* (node: any, context: Context) {
@@ -433,17 +428,9 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
         throw new Error(`not supported yet: ${node.type}`)
     },
 
-    Program: function* (node: any, context: Context) {
-        throw new Error(`not supported yet: ${node.type}`)
-    },
-
-    Main: function* (node: any, context: Context) {
-        throw new Error(`not supported yet: ${node.type}`)
-    },
-
     Function: function* (node: any, context: Context) {
         assign(node.id.text, unassigned, E)
-        push(A, { type: 'FunctionAssignment', lv: node.id.text, val: { type: 'Closure', funcName: node.id.text, funcType: node.t.type, prms: node.prms, blk: node.blk}})
+        push(A, { type: 'FunctionAssignment', lv: node.id.text, val: { type: 'Closure', funcName: node.id.text, funcType: node.t.type, prms: node.prms, blk: node.blk, env: E}})
     },
 
     Closure: function* (node: any, context: Context) {
@@ -520,9 +507,31 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     While_i: function* (node: any, context: Context) {
-        if(S.pop()){
+        if (S.pop()) {
             push(A, node, node.pred, node.body)
         }
+    },
+
+    FnExpr_i: function* (node: any, context: Context) {
+        const func = S.pop()
+        if (A.length === 0 || peek(A).type === 'Environment_i') {
+            // Current E is not needed
+            push(A, { 'type': 'Mark_i' })
+        } else if (peek(A).type === 'Reset_i') {
+            // Tail call case
+            A.pop()
+        } else {
+            push(A, { type: "Environment_i", env: E }, { type: 'Mark_i' })
+        }
+        push(A, func.blk)
+        E = func.env
+
+    },
+
+    Reset_i: function* (node: any, context: Context) {
+        if (A.length !== 0 && A.pop().type !== 'Mark_i') {
+            push(A, node)
+        }  
     },
 }
 // tslint:enable:object-literal-shorthand
@@ -552,6 +561,7 @@ export function* evaluate(node: es.Node, context: Context) {
         console.log(S)
         console.log('PRINTING E')
         console.log(E)
+        console.log('------------------------------')
 
         const cmd = A.pop()
         yield* evaluators[cmd.type](cmd, context)
@@ -565,9 +575,5 @@ export function* evaluate(node: es.Node, context: Context) {
         throw new Error('internal error: stash must be singleton but is not')
     }
     yield* leave(context)
-    console.log('printing Env')
-    console.log(E[1][0]['hello'])
-    console.log(E[1][0]['hi'])
-    console.log(E[1][0]['hey'])
     return S[0]
 }
