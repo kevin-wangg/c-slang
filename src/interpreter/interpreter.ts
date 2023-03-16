@@ -342,7 +342,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     FunctionAssignment: function* (node: any, context: Context) {
-      push(A, {type:'FunctionAssignment_i', lv: node.lv}, node.val)
+        push(A, {type:'FunctionAssignment_i', lv: node.lv}, node.val)
     },
 
     IfStatement: function* (node: any, context: Context) {
@@ -516,16 +516,25 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
         const func = S.pop()
         if (A.length === 0 || peek(A).type === 'Environment_i') {
             // Current E is not needed
-            push(A, { 'type': 'Mark_i' })
+            push(A, { type: 'FnTypeCheck_i', funcType: func.funcType }, { type: 'Mark_i' })
         } else if (peek(A).type === 'Reset_i') {
             // Tail call case
             A.pop()
         } else {
-            push(A, { type: "Environment_i", env: E }, { type: 'Mark_i' })
+            push(A, { type: "Environment_i", env: E }, { type: 'FnTypeCheck_i', funcName: func.funcName, funcType: func.funcType }, { type: 'Mark_i' })
         }
         push(A, func.blk)
         E = func.env
 
+    },
+
+    FnTypeCheck_i: function* (node: any, context: Context) {
+        const retVal = peek(S)
+        if ((node.funcType == 'StringType' && !isString(retVal)) ||
+            (node.funcType == 'BoolType' && !isBoolean(retVal)) ||
+            (node.funcType == 'IntType' && !isInteger(retVal))) {
+            throw new Error('Type mismatch: Function ' + node.funcName + ' should return type ' + node.funcType)
+        }
     },
 
     Reset_i: function* (node: any, context: Context) {
