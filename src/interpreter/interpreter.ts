@@ -92,21 +92,34 @@ const push = (array: Array<any>, ...items: any): Array<any> => {
 
 const peek = (array: Array<any>): any => array.slice(-1)[0]
 
+const isIntFunc = (val: any): boolean => {
+  return val !== null && typeof val === 'object' && val.hasOwnProperty('type') && val.type === 'Closure' && val.funcType === 'IntType'
+}
+
+const isBoolFunc = (val: any): boolean => {
+  return val !== null && typeof val === 'object' && val.hasOwnProperty('type') && val.type === 'Closure' && val.funcType === 'BoolType'
+}
+
+const isStringFunc = (val: any): boolean => {
+  return val !== null && typeof val === 'object' && val.hasOwnProperty('type') && val.type === 'Closure' && val.funcType === 'StringType'
+}
+
 const isTypeMatch = (lval: string, val: any, type: string): boolean => {
-    if (val == unassigned) {
-        return true
-    } else if (type == 'StringType' && isString(val)) {
-        return true
-    } else if (type == 'BoolType' && isBoolean(val)) {
-        return true
-    } else if (type == 'IntType' && isInteger(val)) {
-        return true
-    }
-    return false
+    console.log("IN ISTYPEMATCH")
+    console.log(lval)
+    console.log(val)
+    console.log(type)
+    return val == unassigned ||
+      type == 'StringType' && isString(val) ||
+      type == 'BoolType' && isBoolean(val) ||
+      type == 'IntType' && isInteger(val) ||
+      type == 'StringTypeFunction' && isStringFunc(val) ||
+      type == 'BoolTypeFunction' && isBoolFunc(val) ||
+      type == 'IntTypeFunction' && isIntFunc(val)
 }
 
 const assign = (lval: string, val: any, env: Pair<any, any>): void => {
-    if (env == null) throw new Error('unbound name: ' + lval)
+  if (env == null) throw new Error('unbound name: ' + lval)
     if (env[0].hasOwnProperty(lval) && !isUndeclared(lval)) {
         const type = env[0][lval][0]
         if (isTypeMatch(lval, val, type)) {
@@ -121,16 +134,27 @@ const assign = (lval: string, val: any, env: Pair<any, any>): void => {
     }
 }
 
-const scan = (stmts: any): Array<Pair<string, string>> => {
+const scanBlock = (stmts: any): Array<Pair<string, string>> => {
     const locals = []
     while (stmts.type != 'StatementEmpty') {
         const firstStatement = stmts.first
         if (firstStatement.type == 'DclStatement' || firstStatement.type == 'DclAssignment') {
-            locals.push(pair(firstStatement.d.id.text, firstStatement.d.t.type))
+            locals.push(pair(firstStatement.d.t.type, firstStatement.d.id.text))
         }
         stmts = stmts.rest
     }
     return locals
+}
+
+const scanProg = (node: any): Array<Pair<string, string>> => {
+  const functions: Array<Pair<string, string>> = []
+  while (node.type != 'MainProg') {
+      const funcName = node.fun.id.text
+      const funcType = node.fun.t.type + 'Function'
+      functions.push(pair(funcType, funcName))
+      node = node.prog
+  }
+  return functions
 }
 
 const lookup = (lval: string, env: Pair<any, any>): any => {
@@ -161,7 +185,7 @@ const extendEnvironment = (
     const new_frame = {}
 
     for (let i = 0; i < lvals.length; i++) {
-        new_frame[lvals[i][0]] = pair(lvals[i][1], vals[i])
+        new_frame[lvals[i][1]] = pair(lvals[i][0], vals[i])
     }
 
     return pair(new_frame, env)
@@ -234,7 +258,14 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     FunProg: function* (node: any, context: Context) {
-        throw new Error(`not supported yet: ${node.type}`)
+      console.log("in FunProg")
+      const functionDefinitions: Array<Pair<string,string>> = scanProg(node)
+      console.log('Function defintions')
+      console.log(functionDefinitions)
+      for (let i = 0; i < functionDefinitions.length; i++) {
+          E[0][functionDefinitions[i][1]] = pair(functionDefinitions[i][0], undeclared)
+      }
+      push(A, node.prog, node.fun)
     },
 
     Lambda: function* (node: any, context: Context) {
@@ -295,6 +326,10 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
     Assignment: function* (node: any, context: Context) {
         push(A, {type:'Assignment_i', sym: node.lv}, node.val)
+    },
+
+    FunctionAssignment: function* (node: any, context: Context) {
+      push(A, {type:'FunctionAssignment_i', lv: node.lv}, node.val)
     },
 
     IfStatement: function* (node: any, context: Context) {
@@ -387,11 +422,16 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     Function: function* (node: any, context: Context) {
-        throw new Error(`not supported yet: ${node.type}`)
+        assign(node.id.text, unassigned, E)
+        push(A, { type: 'FunctionAssignment', lv: node.id.text, val: { type: 'Closure', funcName: node.id.text, funcType: node.t.type, prms: node.prms, blk: node.blk}})
+    },
+
+    Closure: function* (node: any, context: Context) {
+        push(S, node)
     },
 
     Block: function* (node: any, context: Context) {
-        const locals: Array<Pair<string,string>> = scan(node.stmnts)
+        const locals: Array<Pair<string,string>> = scanBlock(node.stmnts)
         const unassignedList: Array<any> = locals.map(_ => unassigned)
         if (!(A.length === 0)) {
             push(A, {type: 'Environment_i', env: E})
@@ -441,6 +481,10 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
     Assignment_i: function* (node: any, context: Context) {
         assign(node.sym.id.text, S.pop(), E)
+    },
+
+    FunctionAssignment_i: function* (node: any, context: Context) {
+      assign(node.lv, S.pop(), E)
     },
 
     Environment_i: function* (node: any, context: Context) {
@@ -501,5 +545,9 @@ export function* evaluate(node: es.Node, context: Context) {
         throw new Error('internal error: stash must be singleton but is not')
     }
     yield* leave(context)
+    console.log("printing Env")
+    console.log(E[1][0]['hello'])
+    console.log(E[1][0]['hi'])
+    console.log(E[1][0]['hey'])
     return S[0]
 }
