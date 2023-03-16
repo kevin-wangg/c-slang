@@ -93,33 +93,53 @@ const push = (array: Array<any>, ...items: any): Array<any> => {
 const peek = (array: Array<any>): any => array.slice(-1)[0]
 
 const isIntFunc = (val: any): boolean => {
-  return val !== null && typeof val === 'object' && val.hasOwnProperty('type') && val.type === 'Closure' && val.funcType === 'IntType'
+    return (
+        val !== null &&
+        typeof val === 'object' &&
+        val.hasOwnProperty('type') &&
+        val.type === 'Closure' &&
+        val.funcType === 'IntType'
+    )
 }
 
 const isBoolFunc = (val: any): boolean => {
-  return val !== null && typeof val === 'object' && val.hasOwnProperty('type') && val.type === 'Closure' && val.funcType === 'BoolType'
+    return (
+        val !== null &&
+        typeof val === 'object' &&
+        val.hasOwnProperty('type') &&
+        val.type === 'Closure' &&
+        val.funcType === 'BoolType'
+    )
 }
 
 const isStringFunc = (val: any): boolean => {
-  return val !== null && typeof val === 'object' && val.hasOwnProperty('type') && val.type === 'Closure' && val.funcType === 'StringType'
+    return (
+        val !== null &&
+        typeof val === 'object' &&
+        val.hasOwnProperty('type') &&
+        val.type === 'Closure' &&
+        val.funcType === 'StringType'
+    )
 }
 
 const isTypeMatch = (lval: string, val: any, type: string): boolean => {
-    console.log("IN ISTYPEMATCH")
+    console.log('IN ISTYPEMATCH')
     console.log(lval)
     console.log(val)
     console.log(type)
-    return val == unassigned ||
-      type == 'StringType' && isString(val) ||
-      type == 'BoolType' && isBoolean(val) ||
-      type == 'IntType' && isInteger(val) ||
-      type == 'StringTypeFunction' && isStringFunc(val) ||
-      type == 'BoolTypeFunction' && isBoolFunc(val) ||
-      type == 'IntTypeFunction' && isIntFunc(val)
+    return (
+        val == unassigned ||
+        (type == 'StringType' && isString(val)) ||
+        (type == 'BoolType' && isBoolean(val)) ||
+        (type == 'IntType' && isInteger(val)) ||
+        (type == 'StringTypeFunction' && isStringFunc(val)) ||
+        (type == 'BoolTypeFunction' && isBoolFunc(val)) ||
+        (type == 'IntTypeFunction' && isIntFunc(val))
+    )
 }
 
 const assign = (lval: string, val: any, env: Pair<any, any>): void => {
-  if (env == null) throw new Error('unbound name: ' + lval)
+    if (env == null) throw new Error('unbound name: ' + lval)
     if (env[0].hasOwnProperty(lval) && !isUndeclared(lval)) {
         const type = env[0][lval][0]
         if (isTypeMatch(lval, val, type)) {
@@ -147,14 +167,14 @@ const scanBlock = (stmts: any): Array<Pair<string, string>> => {
 }
 
 const scanProg = (node: any): Array<Pair<string, string>> => {
-  const functions: Array<Pair<string, string>> = []
-  while (node.type != 'MainProg') {
-      const funcName = node.fun.id.text
-      const funcType = node.fun.t.type + 'Function'
-      functions.push(pair(funcType, funcName))
-      node = node.prog
-  }
-  return functions
+    const functions: Array<Pair<string, string>> = []
+    while (node.type != 'MainProg') {
+        const funcName = node.fun.id.text
+        const funcType = node.fun.t.type + 'Function'
+        functions.push(pair(funcType, funcName))
+        node = node.prog
+    }
+    return functions
 }
 
 const lookup = (lval: string, env: Pair<any, any>): any => {
@@ -545,7 +565,7 @@ export function* evaluate(node: es.Node, context: Context) {
         throw new Error('internal error: stash must be singleton but is not')
     }
     yield* leave(context)
-    console.log("printing Env")
+    console.log('printing Env')
     console.log(E[1][0]['hello'])
     console.log(E[1][0]['hi'])
     console.log(E[1][0]['hey'])
