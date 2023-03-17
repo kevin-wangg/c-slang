@@ -137,10 +137,12 @@ const heap_assign = (type: string, val: any, env_addr: number) => {
 }
 
 const heap_lookup = (env_addr: number) => {
-    // console.log(`HEAP LOOKUP ${type} ${env_addr}`)
-    let type = HEAP_TYPE[env_addr]
+    const type = HEAP_TYPE[env_addr]
     if (type == TYPES['IntType'] || type == TYPES['IntStarType'] || type == TYPES['BoolStarType']) {
         return heap_get_int(env_addr)
+    } else if(type == TYPES['BoolType']) {
+        // TODO
+        throw new Error(`${type} lookup in heap not yet supported`)
     } else {
         throw new Error(`${type} lookup in heap not yet supported`)
     }
@@ -550,7 +552,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
         if(!isNumber(addr)) {
             throw new Error(`Can't dereference a non address value: ${addr}`)
         }
-        let val = heap_lookup(addr)
+        const val = heap_lookup(addr)
         push(S, val)
     },
 
