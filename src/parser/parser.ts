@@ -545,8 +545,6 @@ export function parse(source: string, context: Context) {
         }
         const hasErrors = context.errors.find(m => m.severity === ErrorSeverity.ERROR)
         if (program && !hasErrors) {
-            console.log('wowowoer')
-            console.log(program)
             return program
         } else {
             return undefined

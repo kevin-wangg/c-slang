@@ -102,6 +102,8 @@ const isTypeMatch = (val: any, type: string): boolean => {
         return true
     } else if (type == 'IntType' && isInteger(val)) {
         return true
+    } else if ((type == 'IntStarType' || type == 'BoolStarType') && isInteger(val)) {
+        return true
     }
     return false
 }
@@ -134,9 +136,10 @@ const heap_assign = (type: string, val: any, env_addr: number) => {
     }
 }
 
-const heap_lookup = (type: string, env_addr: number) => {
+const heap_lookup = (env_addr: number) => {
     // console.log(`HEAP LOOKUP ${type} ${env_addr}`)
-    if (type == 'IntType') {
+    let type = HEAP_TYPE[env_addr]
+    if (type == TYPES['IntType'] || type == TYPES['IntStarType'] || type == TYPES['BoolStarType']) {
         return heap_get_int(env_addr)
     } else {
         throw new Error(`${type} lookup in heap not yet supported`)
@@ -191,7 +194,23 @@ const extendEnvironment = (
 }
 
 // Memory stuff
+
+const type_sizes = {
+    BoolType: 1,
+    IntType: 4,
+    IntStarType: 4,
+    BoolStarType: 4
+}
+
+const TYPES = {
+    IntType: 1,
+    BoolType: 2,
+    IntStarType: 3,
+    BoolStarType: 4
+}
+
 let HEAP: Uint8Array
+let HEAP_TYPE: Uint8Array
 let heap_size: number
 
 const heap_make = (bytes: number) => {
@@ -202,12 +221,12 @@ const heap_make = (bytes: number) => {
 
 const initialize_machine = (heapsize_bytes: number) => {
     HEAP = heap_make(heapsize_bytes)
+    HEAP_TYPE = heap_make(heapsize_bytes)
     heap_size = heapsize_bytes
 }
 
-const heap_allocate = (bytes: number) => {
-    let i = 0
-    while (i < heap_size) {
+const heap_allocate = (type: number, bytes: number) => {
+    for (let i = 0; i < heap_size; ++i) {
         if (HEAP[i] == 0) {
             let ok = true
             for (let j = i; j <= i + bytes; ++j) {
@@ -218,11 +237,13 @@ const heap_allocate = (bytes: number) => {
             }
             if (ok) {
                 HEAP[i] = bytes
+                for (let j = i + 1; j <= i + bytes; ++j) {
+                    HEAP_TYPE[j] = TYPES[type]
+                }
                 return i + 1
             }
-            i++
         } else {
-            i += HEAP[i] + 1
+            i += HEAP[i]
         }
     }
     return -1
@@ -265,13 +286,6 @@ const get_int_third_byte = (num: number) => {
 
 const get_int_fourth_byte = (num: number) => {
     return num & 0x000000ff
-}
-
-const type_sizes = {
-    BoolType: 1,
-    IntType: 4,
-    IntStarType: 4,
-    BoolStarType: 4
 }
 
 // Interpreter configurations:
@@ -380,10 +394,6 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
         // Do Nothing
     },
 
-    DerefAddress: function* (node: any, context: Context) {
-        throw new Error(`not supported yet: ${node.type}`)
-    },
-
     ArgsList: function* (node: any, context: Context) {
         throw new Error(`not supported yet: ${node.type}`)
     },
@@ -393,10 +403,14 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     IdLvalue: function* (node: any, context: Context) {
-        throw new Error(`not supported yet: ${node.type}`)
+        push(S, node.id.text)
     },
 
     BracketLvalue: function* (node: any, context: Context) {
+        push(A, node.lv)
+    },
+    
+    DerefAddress: function* (node: any, context: Context) {
         throw new Error(`not supported yet: ${node.type}`)
     },
 
@@ -409,7 +423,8 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     Assignment: function* (node: any, context: Context) {
-        push(A, {type:'Assignment_i', sym: node.lv}, node.val)
+        push(A, { type: 'Assignment_i' }, node.lv, node.val)
+        // push(A, {type:'Assignment_i', sym: node.lv}, node.val)
     },
 
     IfStatement: function* (node: any, context: Context) {
@@ -474,11 +489,11 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     IdExpr: function* (node: any, context: Context) {
-        const [type, addr] = lookup(node.id.text, E)
+        const [_, addr] = lookup(node.id.text, E)
         if(isUndeclared(addr)) {
             throw new Error(`Lookup of undeclared variable ${node.id.text}`)
         }
-        const val = heap_lookup(type, addr)
+        const val = heap_lookup(addr)
         push(S, val)
     },
 
@@ -521,7 +536,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     Dcl: function* (node: any, context: Context) {
-        const addr = heap_allocate(type_sizes[node.t.type])
+        const addr = heap_allocate(node.t.type, type_sizes[node.t.type])
         assign(node.id.text, addr, E)
     },
 
@@ -531,18 +546,18 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
     // Instructions
     StarExpr_i: function* (node: any, context: Context) {
-        const expr = S.pop()
-        if(!isNumber(expr)) {
-            throw new Error(`Can't dereference a non address value: ${expr}`)
+        const addr = S.pop()
+        if(!isNumber(addr)) {
+            throw new Error(`Can't dereference a non address value: ${addr}`)
         }
-        // need to add types directly in heap i think
-        push(S, heap)
+        let val = heap_lookup(addr)
+        push(S, val)
     },
 
     AmperSandExpr_i: function* (node: any, context: Context) {
-        const expr = S.pop()
-        const [type, addr] = lookup()
-        // need to change grammar so ampersand to lvalue
+        const lvalue = S.pop()
+        const [_, addr] = lookup(lvalue, E)
+        push(S, addr)
     },
 
     UnopExpr_i: function* (node: any, context: Context) {
@@ -576,7 +591,8 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     Assignment_i: function* (node: any, context: Context) {
-        const [type, addr] = lookup(node.sym.id.text, E)
+        const lvalue = S.pop()
+        const [type, addr] = lookup(lvalue, E)
         if(isUndeclared(addr)) {
             throw new Error('Assignment to undeclared variable')
         }

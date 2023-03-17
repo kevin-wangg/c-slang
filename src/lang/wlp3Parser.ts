@@ -2,24 +2,25 @@
 
 import { ATN } from 'antlr4ts/atn/ATN'
 import { ATNDeserializer } from 'antlr4ts/atn/ATNDeserializer'
-import { ParserATNSimulator } from 'antlr4ts/atn/ParserATNSimulator'
-import { NotNull } from 'antlr4ts/Decorators'
-import { Override } from 'antlr4ts/Decorators'
 import { FailedPredicateException } from 'antlr4ts/FailedPredicateException'
-import * as Utils from 'antlr4ts/misc/Utils'
+import { NotNull } from 'antlr4ts/Decorators'
 import { NoViableAltException } from 'antlr4ts/NoViableAltException'
+import { Override } from 'antlr4ts/Decorators'
 import { Parser } from 'antlr4ts/Parser'
 import { ParserRuleContext } from 'antlr4ts/ParserRuleContext'
-import { RecognitionException } from 'antlr4ts/RecognitionException'
-import { RuleContext } from 'antlr4ts/RuleContext'
-import { Token } from 'antlr4ts/Token'
-import { TokenStream } from 'antlr4ts/TokenStream'
+import { ParserATNSimulator } from 'antlr4ts/atn/ParserATNSimulator'
 import { ParseTreeListener } from 'antlr4ts/tree/ParseTreeListener'
 import { ParseTreeVisitor } from 'antlr4ts/tree/ParseTreeVisitor'
+import { RecognitionException } from 'antlr4ts/RecognitionException'
+import { RuleContext } from 'antlr4ts/RuleContext'
 //import { RuleVersion } from "antlr4ts/RuleVersion";
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode'
+import { Token } from 'antlr4ts/Token'
+import { TokenStream } from 'antlr4ts/TokenStream'
 import { Vocabulary } from 'antlr4ts/Vocabulary'
 import { VocabularyImpl } from 'antlr4ts/VocabularyImpl'
+
+import * as Utils from 'antlr4ts/misc/Utils'
 
 import { wlp3Listener } from './wlp3Listener'
 import { wlp3Visitor } from './wlp3Visitor'
@@ -263,7 +264,7 @@ export class wlp3Parser extends Parser {
     }
     // @RuleVersion(0)
     public main(): MainContext {
-        const _localctx: MainContext = new MainContext(this._ctx, this.state)
+        let _localctx: MainContext = new MainContext(this._ctx, this.state)
         this.enterRule(_localctx, 2, wlp3Parser.RULE_main)
         try {
             this.enterOuterAlt(_localctx, 1)
@@ -294,7 +295,7 @@ export class wlp3Parser extends Parser {
     }
     // @RuleVersion(0)
     public function(): FunctionContext {
-        const _localctx: FunctionContext = new FunctionContext(this._ctx, this.state)
+        let _localctx: FunctionContext = new FunctionContext(this._ctx, this.state)
         this.enterRule(_localctx, 4, wlp3Parser.RULE_function)
         try {
             this.enterOuterAlt(_localctx, 1)
@@ -327,7 +328,7 @@ export class wlp3Parser extends Parser {
     }
     // @RuleVersion(0)
     public block(): BlockContext {
-        const _localctx: BlockContext = new BlockContext(this._ctx, this.state)
+        let _localctx: BlockContext = new BlockContext(this._ctx, this.state)
         this.enterRule(_localctx, 6, wlp3Parser.RULE_block)
         try {
             this.enterOuterAlt(_localctx, 1)
@@ -496,7 +497,7 @@ export class wlp3Parser extends Parser {
     }
     // @RuleVersion(0)
     public dcl(): DclContext {
-        const _localctx: DclContext = new DclContext(this._ctx, this.state)
+        let _localctx: DclContext = new DclContext(this._ctx, this.state)
         this.enterRule(_localctx, 14, wlp3Parser.RULE_dcl)
         try {
             this.enterOuterAlt(_localctx, 1)
@@ -584,11 +585,11 @@ export class wlp3Parser extends Parser {
             _p = 0
         }
 
-        const _parentctx: ParserRuleContext = this._ctx
-        const _parentState: number = this.state
+        let _parentctx: ParserRuleContext = this._ctx
+        let _parentState: number = this.state
         let _localctx: ExprContext = new ExprContext(this._ctx, _parentState)
         let _prevctx: ExprContext = _localctx
-        const _startState: number = 18
+        let _startState: number = 18
         this.enterRecursionRule(_localctx, 18, wlp3Parser.RULE_expr, _p)
         try {
             let _alt: number
@@ -706,7 +707,7 @@ export class wlp3Parser extends Parser {
                             this.state = 108
                             this.match(wlp3Parser.T__12)
                             this.state = 109
-                            ;(_localctx as AmpersandExprContext)._first = this.expr(1)
+                            ;(_localctx as AmpersandExprContext)._first = this.lvalue()
                         }
                         break
                 }
@@ -1043,7 +1044,7 @@ export class wlp3Parser extends Parser {
     }
     // @RuleVersion(0)
     public binaryoperator(): BinaryoperatorContext {
-        const _localctx: BinaryoperatorContext = new BinaryoperatorContext(this._ctx, this.state)
+        let _localctx: BinaryoperatorContext = new BinaryoperatorContext(this._ctx, this.state)
         this.enterRule(_localctx, 26, wlp3Parser.RULE_binaryoperator)
         let _la: number
         try {
@@ -1094,7 +1095,7 @@ export class wlp3Parser extends Parser {
     }
     // @RuleVersion(0)
     public binarylogical(): BinarylogicalContext {
-        const _localctx: BinarylogicalContext = new BinarylogicalContext(this._ctx, this.state)
+        let _localctx: BinarylogicalContext = new BinarylogicalContext(this._ctx, this.state)
         this.enterRule(_localctx, 28, wlp3Parser.RULE_binarylogical)
         let _la: number
         try {
@@ -1128,7 +1129,7 @@ export class wlp3Parser extends Parser {
     }
     // @RuleVersion(0)
     public unaryoperator(): UnaryoperatorContext {
-        const _localctx: UnaryoperatorContext = new UnaryoperatorContext(this._ctx, this.state)
+        let _localctx: UnaryoperatorContext = new UnaryoperatorContext(this._ctx, this.state)
         this.enterRule(_localctx, 30, wlp3Parser.RULE_unaryoperator)
         try {
             this.enterOuterAlt(_localctx, 1)
@@ -1151,7 +1152,7 @@ export class wlp3Parser extends Parser {
     }
     // @RuleVersion(0)
     public predicate(): PredicateContext {
-        const _localctx: PredicateContext = new PredicateContext(this._ctx, this.state)
+        let _localctx: PredicateContext = new PredicateContext(this._ctx, this.state)
         this.enterRule(_localctx, 32, wlp3Parser.RULE_predicate)
         try {
             this.enterOuterAlt(_localctx, 1)
@@ -1294,7 +1295,7 @@ export class wlp3Parser extends Parser {
         'cd\x07\x05\x02\x02de\x05\x18\r\x02ef\x07\x06\x02\x02fq\x03\x02\x02\x02' +
         'gh\x07\r\x02\x02hi\x07\x05\x02\x02ij\x05\x14\v\x02jk\x07\x06\x02\x02k' +
         'q\x03\x02\x02\x02lm\x07\x0E\x02\x02mq\x05\x14\v\x04no\x07\x0F\x02\x02' +
-        'oq\x05\x14\v\x03pW\x03\x02\x02\x02pY\x03\x02\x02\x02pZ\x03\x02\x02\x02' +
+        'oq\x05$\x13\x02pW\x03\x02\x02\x02pY\x03\x02\x02\x02pZ\x03\x02\x02\x02' +
         'p^\x03\x02\x02\x02pa\x03\x02\x02\x02pb\x03\x02\x02\x02pg\x03\x02\x02\x02' +
         'pl\x03\x02\x02\x02pn\x03\x02\x02\x02q|\x03\x02\x02\x02rs\f\t\x02\x02s' +
         't\x05\x1C\x0F\x02tu\x05\x14\v\nu{\x03\x02\x02\x02vw\f\b\x02\x02wx\x05' +
@@ -2248,9 +2249,9 @@ export class StarExprContext extends ExprContext {
     }
 }
 export class AmpersandExprContext extends ExprContext {
-    public _first!: ExprContext
-    public expr(): ExprContext {
-        return this.getRuleContext(0, ExprContext)
+    public _first!: LvalueContext
+    public lvalue(): LvalueContext {
+        return this.getRuleContext(0, LvalueContext)
     }
     constructor(ctx: ExprContext) {
         super(ctx.parent, ctx.invokingState)
