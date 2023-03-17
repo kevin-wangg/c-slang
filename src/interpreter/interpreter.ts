@@ -413,9 +413,8 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     FnExpr: function* (node: any, context: Context) {
         // TODO: Implement parameter handling
         let numArgs = 0
-        let arglist = node.arglst
-        if (arglist.type !== 'ArgsEmpty') {
-            let args = arglist.list
+        if (node.arglst.type !== 'ArgsEmpty') {
+            let args = node.arglst.list
               while (args.type !== 'SingleArg') {
                   numArgs++
                   args = args.rest
@@ -440,11 +439,11 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
     Function: function* (node: any, context: Context) {
         assign(node.id.text, unassigned, E)
-        let params = []
+        const params = []
         if (node.prms.type === 'ParamsList') {
             let paramsList = node.prms.list
             while (paramsList.type !== 'SingleParam') {
-                let param = paramsList.first
+                const param = paramsList.first
                 params.push(pair(param.t, param.id.text))
                 paramsList = paramsList.rest
             }
@@ -535,7 +534,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
     FnExpr_i: function* (node: any, context: Context) {
         const arity = node.arity
-        let args = []
+        const args = []
 
         for (let i = arity - 1; i >= 0; i--) {
             args[i] = S.pop()
