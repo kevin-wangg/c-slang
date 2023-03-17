@@ -140,7 +140,7 @@ const heap_lookup = (env_addr: number) => {
     const type = HEAP_TYPE[env_addr]
     if (type == TYPES['IntType'] || type == TYPES['IntStarType'] || type == TYPES['BoolStarType']) {
         return heap_get_int(env_addr)
-    } else if(type == TYPES['BoolType']) {
+    } else if (type == TYPES['BoolType']) {
         // TODO
         throw new Error(`${type} lookup in heap not yet supported`)
     } else {
