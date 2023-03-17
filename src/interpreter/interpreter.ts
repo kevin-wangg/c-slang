@@ -237,7 +237,7 @@ const heap_get_bool = (addr: number) => {
 }
 
 const heap_set_bool = (addr: number, b: boolean) => {
-    let val = b ? 1 : 0
+    const val = b ? 1 : 0
     heap_set(addr, val)
 }
 
