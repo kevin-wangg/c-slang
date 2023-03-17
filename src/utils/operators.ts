@@ -186,7 +186,7 @@ export function evaluateBinaryExpression(operator: string, left: any, right: any
         case '*':
             return left * right
         case '/':
-            return left / right
+            return Math.floor(left / right)
         case '%':
             return left % right
         case '==':

@@ -122,7 +122,7 @@ const isStringFunc = (val: any): boolean => {
     )
 }
 
-const isTypeMatch = (lval: string, val: any, type: string): boolean => {
+const isTypeMatch = (val: any, type: string): boolean => {
     return (
         val == unassigned ||
         (type == 'StringType' && isString(val)) ||
@@ -138,7 +138,7 @@ const assign = (lval: string, val: any, env: Pair<any, any>): void => {
     if (env == null) throw new Error('unbound name: ' + lval)
     if (env[0].hasOwnProperty(lval) && !isUndeclared(lval)) {
         const type = env[0][lval][0]
-        if (isTypeMatch(lval, val, type)) {
+        if (isTypeMatch(val, type)) {
             env[0][lval][1] = val
         } else {
             throw new Error('Type mismatch: ' + lval + ' is a ' + type)
@@ -314,11 +314,11 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     ArgsList: function* (node: any, context: Context) {
-        throw new Error(`not supported yet: ${node.type}`)
+        push(A, node.list)
     },
 
     ArgsEmpty: function* (node: any, context: Context) {
-        throw new Error(`not supported yet: ${node.type}`)
+        // Do Nothing
     },
 
     IdLvalue: function* (node: any, context: Context) {
@@ -330,11 +330,11 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     SingleArg: function* (node: any, context: Context) {
-        throw new Error(`not supported yet: ${node.type}`)
+        push(A, node.first)
     },
 
     MultiArgs: function* (node: any, context: Context) {
-        throw new Error(`not supported yet: ${node.type}`)
+        push(A, node.rest, node.first)
     },
 
     Assignment: function* (node: any, context: Context) {
@@ -412,7 +412,17 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
     FnExpr: function* (node: any, context: Context) {
         // TODO: Implement parameter handling
-        push(A, {type: "FnExpr_i"})
+        let numArgs = 0
+        let arglist = node.arglst
+        if (arglist.type !== 'ArgsEmpty') {
+            let args = arglist.list
+              while (args.type !== 'SingleArg') {
+                  numArgs++
+                  args = args.rest
+              }
+              numArgs++
+        }
+        push(A, {type: "FnExpr_i", arity: numArgs, funcName: node.id.text }, node.arglst)
         push(S, lookup(node.id.text, E))
     },
 
@@ -430,7 +440,18 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
     Function: function* (node: any, context: Context) {
         assign(node.id.text, unassigned, E)
-        push(A, { type: 'FunctionAssignment', lv: node.id.text, val: { type: 'Closure', funcName: node.id.text, funcType: node.t.type, prms: node.prms, blk: node.blk, env: E}})
+        let params = []
+        if (node.prms.type === 'ParamsList') {
+            let paramsList = node.prms.list
+            while (paramsList.type !== 'SingleParam') {
+                let param = paramsList.first
+                params.push(pair(param.t, param.id.text))
+                paramsList = paramsList.rest
+            }
+            params.push(pair(paramsList.first.t, paramsList.first.id.text))
+        }
+        
+        push(A, { type: 'FunctionAssignment', lv: node.id.text, val: { type: 'Closure', funcName: node.id.text, funcType: node.t.type, prms: params, blk: node.blk, env: E}})
     },
 
     Closure: function* (node: any, context: Context) {
@@ -513,7 +534,14 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     FnExpr_i: function* (node: any, context: Context) {
+        const arity = node.arity
+        let args = []
+
+        for (let i = arity - 1; i >= 0; i--) {
+            args[i] = S.pop()
+        }
         const func = S.pop()
+
         if (A.length === 0 || peek(A).type === 'Environment_i') {
             // Current E is not needed
             push(A, { type: 'FnTypeCheck_i', funcType: func.funcType }, { type: 'Mark_i' })
@@ -521,11 +549,19 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
             // Tail call case
             A.pop()
         } else {
-            push(A, { type: "Environment_i", env: E }, { type: 'FnTypeCheck_i', funcName: func.funcName, funcType: func.funcType }, { type: 'Mark_i' })
+            push(A, { type: 'Environment_i', env: E }, { type: 'FnTypeCheck_i', funcName: func.funcName, funcType: func.funcType }, { type: 'Mark_i' })
         }
         push(A, func.blk)
-        E = func.env
-
+        
+        if (func.prms.length != args.length) {
+            throw new Error('Incorrect number of arguments provided to function ' + func.funcName)
+        }
+        for (let i = 0; i < args.length; i++) {
+            if (!isTypeMatch(args[i], func.prms[i][0].type)) {
+                throw new Error('Parameter type mismatch for function ' + func.funcName + ': Parameter ' + func.prms[i][1] + ' should be of type ' + func.prms[i][0].type)
+            }
+        }
+        E = extendEnvironment(func.prms, args, func.env)
     },
 
     FnTypeCheck_i: function* (node: any, context: Context) {
