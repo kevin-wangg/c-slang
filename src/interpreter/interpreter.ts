@@ -103,6 +103,7 @@ const isTypeMatch = (val: any, type: string): boolean => {
     } else if (type == 'IntType' && isInteger(val)) {
         return true
     } else if ((type == 'IntStarType' || type == 'BoolStarType') && isInteger(val)) {
+        // TODO: actually check the type of the pointer in heap to see if it matches with declared type
         return true
     }
     return false
@@ -112,39 +113,8 @@ const assign = (lval: string, val: number, env: Pair<any, any>): void => {
     if (env == null) throw new Error('unbound name: ' + lval)
     if (env[0].hasOwnProperty(lval)) {
         env[0][lval][1] = val
-        // const type = env[0][lval][0]
-        // if (isTypeMatch(lval, val, type)) {
-        //     env[0][lval][1] = val
-        // } else {
-        //     throw new Error('Type mismatch: ' + lval + ' is a ' + type)
-        // }
     } else {
         assign(lval, val, env[1])
-    }
-}
-
-const heap_assign = (type: string, val: any, env_addr: number) => {
-    // console.log(`HEAP ASSIGN ${type} ${val} ${env_addr}`)
-    if (isTypeMatch(val, type)) {
-        if (isNumber(val)) {
-            heap_set_int(env_addr, val)
-        } else {
-            throw new Error('Variable type in heap not yet supported')
-        }
-    } else {
-        throw new Error(`Type mismatch: ${type} ${val}`)
-    }
-}
-
-const heap_lookup = (env_addr: number) => {
-    const type = HEAP_TYPE[env_addr]
-    if (type == TYPES['IntType'] || type == TYPES['IntStarType'] || type == TYPES['BoolStarType']) {
-        return heap_get_int(env_addr)
-    } else if (type == TYPES['BoolType']) {
-        // TODO
-        throw new Error(`${type} lookup in heap not yet supported`)
-    } else {
-        throw new Error(`${type} lookup in heap not yet supported`)
     }
 }
 
@@ -166,9 +136,6 @@ const lookup = (lval: string, env: Pair<any, any>): Pair<any, any> => {
     }
     if (env[0].hasOwnProperty(lval)) {
         const v = env[0][lval]
-        // console.log(`LOOKUP ${lval}, found ${v}`)
-        // if (isUnassigned(v) || isUndeclared(v))
-        //     throw new Error('Unassigned or undeclared name for ' + lval)
         return v
     }
     return lookup(lval, env[1])
@@ -205,11 +172,13 @@ const type_sizes = {
 }
 
 const TYPES = {
-    IntType: 1,
-    BoolType: 2,
-    IntStarType: 3,
-    BoolStarType: 4
+    IntType: 0,
+    BoolType: 1,
+    IntStarType: 2,
+    BoolStarType: 3
 }
+
+const REVERSE_TYPES = ['IntType', 'BoolType', 'IntStarType', 'BoolStarType']
 
 let HEAP: Uint8Array
 let HEAP_TYPE: Uint8Array
@@ -259,6 +228,19 @@ const heap_set = (addr: number, val: number) => {
     HEAP[addr] = val
 }
 
+const heap_get_bool = (addr: number) => {
+    const byte = heap_get(addr)
+    if (byte === 1) {
+        return true
+    }
+    return false
+}
+
+const heap_set_bool = (addr: number, b: boolean) => {
+    let val = b ? 1 : 0
+    heap_set(addr, val)
+}
+
 const heap_get_int = (addr: number) => {
     const first_byte = heap_get(addr)
     const second_byte = heap_get(addr + 1)
@@ -288,6 +270,31 @@ const get_int_third_byte = (num: number) => {
 
 const get_int_fourth_byte = (num: number) => {
     return num & 0x000000ff
+}
+
+const heap_assign = (type: string, val: any, env_addr: number) => {
+    if (isTypeMatch(val, type)) {
+        if (isNumber(val)) {
+            heap_set_int(env_addr, val)
+        } else if (isBoolean(val)) {
+            heap_set_bool(env_addr, val)
+        } else {
+            throw new Error('Variable type in heap not yet supported')
+        }
+    } else {
+        throw new Error(`Type mismatch: ${type} ${val}`)
+    }
+}
+
+const heap_lookup = (env_addr: number) => {
+    const type = HEAP_TYPE[env_addr]
+    if (type == TYPES['IntType'] || type == TYPES['IntStarType'] || type == TYPES['BoolStarType']) {
+        return heap_get_int(env_addr)
+    } else if (type == TYPES['BoolType']) {
+        return heap_get_bool(env_addr)
+    } else {
+        throw new Error(`${type} lookup in heap not yet supported`)
+    }
 }
 
 // Interpreter configurations:
@@ -413,7 +420,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
     
     DerefAddress: function* (node: any, context: Context) {
-        throw new Error(`not supported yet: ${node.type}`)
+        push(A, node.expr)
     },
 
     SingleArg: function* (node: any, context: Context) {
@@ -426,7 +433,6 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
     Assignment: function* (node: any, context: Context) {
         push(A, { type: 'Assignment_i' }, node.lv, node.val)
-        // push(A, {type:'Assignment_i', sym: node.lv}, node.val)
     },
 
     IfStatement: function* (node: any, context: Context) {
@@ -594,15 +600,26 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
     Assignment_i: function* (node: any, context: Context) {
         const lvalue = S.pop()
-        const [type, addr] = lookup(lvalue, E)
-        if(isUndeclared(addr)) {
-            throw new Error('Assignment to undeclared variable')
-        }
-        if(!isNumber(addr)) {
-            throw new Error('Invalid variable value. Should be address')
-        }
         const new_val = S.pop()
-        heap_assign(type, new_val, addr)
+        if(isNumber(lvalue)) {
+            // Lvalue is address (dereference address)
+            const type = REVERSE_TYPES[HEAP_TYPE[lvalue]]
+            heap_assign(type, new_val, lvalue)
+        }
+        else if(isString(lvalue)) {
+            // Lvalue is variable name
+            const [type, addr] = lookup(lvalue, E)
+            if(isUndeclared(addr)) {
+                throw new Error('Assignment to undeclared variable')
+            }
+            if(!isNumber(addr)) {
+                throw new Error('Invalid variable value. Should be address')
+            }
+            heap_assign(type, new_val, addr)
+        }
+        else {
+            throw new Error(`Invalid lvalue: ${lvalue}`)
+        }
     },
 
     Environment_i: function* (node: any, context: Context) {
