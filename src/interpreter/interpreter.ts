@@ -125,16 +125,19 @@ const isStringFunc = (val: any): boolean => {
 
 const isTypeMatch = (val: any, type: string): boolean => {
     return (
-        val == unassigned || type === 'AnyType' ||
+        val == unassigned ||
+        type === 'AnyType' ||
         (type == 'StringType' && isString(val)) ||
         (type == 'BoolType' && isBoolean(val)) ||
         (type == 'IntType' && isInteger(val)) ||
         (type == 'StringTypeFunction' && isStringFunc(val)) ||
         (type == 'BoolTypeFunction' && isBoolFunc(val)) ||
         (type == 'IntTypeFunction' && isIntFunc(val)) ||
-        (type === 'IntStarType' && isInteger(val) && 
+        (type === 'IntStarType' &&
+            isInteger(val) &&
             (HEAP_TYPE[val] === TYPES['IntType'] || HEAP_TYPE[val] === TYPES['AnyType'])) ||
-        (type === 'BoolStarType' && isInteger(val) && 
+        (type === 'BoolStarType' &&
+            isInteger(val) &&
             (HEAP_TYPE[val] === TYPES['BoolType'] || HEAP_TYPE[val] === TYPES['AnyType']))
     )
 }
@@ -797,7 +800,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
         if (func.prms.length != args.length) {
             throw new Error('Incorrect number of arguments provided to function ' + func.funcName)
         }
-        let addresses = []
+        const addresses = []
         for (let i = 0; i < args.length; i++) {
             if (!isTypeMatch(args[i], func.prms[i][0].type)) {
                 throw new Error('Parameter type mismatch for function ' + func.funcName + ': Parameter ' + func.prms[i][1] + ' should be of type ' + func.prms[i][0].type)
