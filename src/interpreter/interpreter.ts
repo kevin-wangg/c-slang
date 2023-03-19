@@ -96,21 +96,32 @@ const peek = (array: Array<any>): any => array.slice(-1)[0]
 const isTypeMatch = (val: any, type: string): boolean => {
     if (val == unassigned) {
         return true
+    } else if (type == 'AnyType') {
+        return true
     } else if (type == 'StringType' && isString(val)) {
         return true
     } else if (type == 'BoolType' && isBoolean(val)) {
         return true
     } else if (type == 'IntType' && isInteger(val)) {
         return true
-    } else if ((type == 'IntStarType' || type == 'BoolStarType') && isInteger(val)) {
-        // TODO: actually check the type of the pointer in heap to see if it matches with declared type
+    } else if (
+        type === 'IntStarType' &&
+        isInteger(val) &&
+        (HEAP_TYPE[val] === TYPES['IntType'] || HEAP_TYPE[val] === TYPES['AnyType'])
+    ) {
+        return true
+    } else if (
+        type === 'BoolStarType' &&
+        isInteger(val) &&
+        (HEAP_TYPE[val] === TYPES['BoolType'] || HEAP_TYPE[val] === TYPES['AnyType'])
+    ) {
         return true
     }
     return false
 }
 
 const assign = (lval: string, val: number, env: Pair<any, any>): void => {
-    if (env == null) throw new Error('unbound name: ' + lval)
+    if (env == null) throw new Error('Unbound name: ' + lval)
     if (env[0].hasOwnProperty(lval)) {
         env[0][lval][1] = val
     } else {
@@ -175,10 +186,11 @@ const TYPES = {
     IntType: 0,
     BoolType: 1,
     IntStarType: 2,
-    BoolStarType: 3
+    BoolStarType: 3,
+    AnyType: 4
 }
 
-const REVERSE_TYPES = ['IntType', 'BoolType', 'IntStarType', 'BoolStarType']
+const REVERSE_TYPES = ['IntType', 'BoolType', 'IntStarType', 'BoolStarType', 'AnyType']
 
 let HEAP: Uint8Array
 let HEAP_TYPE: Uint8Array
@@ -196,7 +208,7 @@ const initialize_machine = (heapsize_bytes: number) => {
     heap_size = heapsize_bytes
 }
 
-const heap_allocate = (type: number, bytes: number) => {
+const heap_allocate = (type: string, bytes: number) => {
     for (let i = 0; i < heap_size; ++i) {
         if (HEAP[i] == 0) {
             let ok = true
@@ -220,6 +232,14 @@ const heap_allocate = (type: number, bytes: number) => {
     return -1
 }
 
+const heap_deallocate = (addr: number) => {
+    const number_of_bytes = HEAP[addr - 1]
+    HEAP[addr - 1] = 0
+    for (let i = addr; i < addr + number_of_bytes; ++i) {
+        HEAP[i] = 0
+    }
+}
+
 const heap_get = (addr: number) => {
     return HEAP[addr]
 }
@@ -239,6 +259,7 @@ const heap_get_bool = (addr: number) => {
 const heap_set_bool = (addr: number, b: boolean) => {
     const val = b ? 1 : 0
     heap_set(addr, val)
+    HEAP_TYPE[addr] = TYPES['BoolType']
 }
 
 const heap_get_int = (addr: number) => {
@@ -254,6 +275,10 @@ const heap_set_int = (addr: number, num: number) => {
     heap_set(addr + 1, get_int_second_byte(num))
     heap_set(addr + 2, get_int_third_byte(num))
     heap_set(addr + 3, get_int_fourth_byte(num))
+    HEAP_TYPE[addr] = TYPES['IntType']
+    HEAP_TYPE[addr + 1] = TYPES['IntType']
+    HEAP_TYPE[addr + 2] = TYPES['IntType']
+    HEAP_TYPE[addr + 3] = TYPES['IntType']
 }
 
 const get_int_first_byte = (num: number) => {
@@ -272,9 +297,35 @@ const get_int_fourth_byte = (num: number) => {
     return num & 0x000000ff
 }
 
+const heap_set_int_star = (addr: number, pointer: number) => {
+    heap_set(addr, get_int_first_byte(pointer))
+    heap_set(addr + 1, get_int_second_byte(pointer))
+    heap_set(addr + 2, get_int_third_byte(pointer))
+    heap_set(addr + 3, get_int_fourth_byte(pointer))
+    HEAP_TYPE[addr] = TYPES['IntStarType']
+    HEAP_TYPE[addr + 1] = TYPES['IntStarType']
+    HEAP_TYPE[addr + 2] = TYPES['IntStarType']
+    HEAP_TYPE[addr + 3] = TYPES['IntStarType']
+}
+
+const heap_set_bool_star = (addr: number, pointer: number) => {
+    heap_set(addr, get_int_first_byte(pointer))
+    heap_set(addr + 1, get_int_second_byte(pointer))
+    heap_set(addr + 2, get_int_third_byte(pointer))
+    heap_set(addr + 3, get_int_fourth_byte(pointer))
+    HEAP_TYPE[addr] = TYPES['BoolStarType']
+    HEAP_TYPE[addr + 1] = TYPES['BoolStarType']
+    HEAP_TYPE[addr + 2] = TYPES['BoolStarType']
+    HEAP_TYPE[addr + 3] = TYPES['BoolStarType']
+}
+
 const heap_assign = (type: string, val: any, env_addr: number) => {
     if (isTypeMatch(val, type)) {
-        if (isNumber(val)) {
+        if (type === 'IntStarType') {
+            heap_set_int_star(env_addr, val)
+        } else if (type === 'BoolStarType') {
+            heap_set_bool_star(env_addr, val)
+        } else if (isNumber(val)) {
             heap_set_int(env_addr, val)
         } else if (isBoolean(val)) {
             heap_set_bool(env_addr, val)
@@ -461,7 +512,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     FreeStatement: function* (node: any, context: Context) {
-        throw new Error(`not supported yet: ${node.type}`)
+        push(A, {type: 'Free_i' }, node.val)
     },
 
     ExprStatement: function* (node: any, context: Context) {
@@ -510,7 +561,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     MallocExpr: function* (node: any, context: Context) {
-        throw new Error(`not supported yet: ${node.type}`)
+        push(A, { type: 'MallocExpr_i' }, node.first)
     },
 
     StarExpr: function* (node: any, context: Context) {
@@ -553,6 +604,17 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     // Instructions
+    MallocExpr_i: function* (node: any, context: Context) {
+        const bytes_to_allocate = S.pop()
+        const addr = heap_allocate('AnyType', bytes_to_allocate)
+        push(S, addr)
+    },
+
+    Free_i: function* (node: any, context: Context) {
+        const addr = S.pop()
+        heap_deallocate(addr)
+    },
+
     StarExpr_i: function* (node: any, context: Context) {
         const addr = S.pop()
         if(!isNumber(addr)) {
