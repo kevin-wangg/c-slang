@@ -564,6 +564,14 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
         push(A, { type: 'Pop_i' }, node.val)
     },
 
+    BreakStatement: function* (node: any, context: Context) {
+        push(A, { type: 'Break_i' })
+    },
+
+    ContinueStatement: function* (node: any, context: Context) {
+        push(A, { type: 'Continue_i' })
+    },
+
     Parentheses: function* (node: any, context: Context) {
         push(A, node.val)
     },
@@ -836,6 +844,27 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
     Print_i: function* (node: any, context: Context) {
         console.log(S.pop())
+    },
+
+    Break_i: function* (node: any, context: Context) {
+        let next = A.pop()
+        while(next.type != 'While_i'){
+            if(next.type == 'Environment_i'){
+                E = next.env
+            }
+            next = A.pop()
+        }
+    },
+
+    Continue_i: function* (node: any, context: Context) {
+        let next = A.pop()
+        while(next.type != 'While_i'){
+            if(next.type == 'Environment_i'){
+                E = next.env
+            }
+            next = A.pop()
+        }
+        push(A, next, next.pred)
     },
 }
 // tslint:enable:object-literal-shorthand
