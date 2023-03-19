@@ -93,34 +93,53 @@ const push = (array: Array<any>, ...items: any): Array<any> => {
 
 const peek = (array: Array<any>): any => array.slice(-1)[0]
 
-const isTypeMatch = (val: any, type: string): boolean => {
-    if (val == unassigned) {
-        return true
-    } else if (type == 'AnyType') {
-        return true
-    } else if (type == 'StringType' && isString(val)) {
-        return true
-    } else if (type == 'BoolType' && isBoolean(val)) {
-        return true
-    } else if (type == 'IntType' && isInteger(val)) {
-        return true
-    } else if (
-        type === 'IntStarType' &&
-        isInteger(val) &&
-        (HEAP_TYPE[val] === TYPES['IntType'] || HEAP_TYPE[val] === TYPES['AnyType'])
-    ) {
-        return true
-    } else if (
-        type === 'BoolStarType' &&
-        isInteger(val) &&
-        (HEAP_TYPE[val] === TYPES['BoolType'] || HEAP_TYPE[val] === TYPES['AnyType'])
-    ) {
-        return true
-    }
-    return false
+const isIntFunc = (val: any): boolean => {
+    return (
+        val !== null &&
+        typeof val === 'object' &&
+        val.hasOwnProperty('type') &&
+        val.type === 'Closure' &&
+        val.funcType === 'IntType'
+    )
 }
 
-const assign = (lval: string, val: number, env: Pair<any, any>): void => {
+const isBoolFunc = (val: any): boolean => {
+    return (
+        val !== null &&
+        typeof val === 'object' &&
+        val.hasOwnProperty('type') &&
+        val.type === 'Closure' &&
+        val.funcType === 'BoolType'
+    )
+}
+
+const isStringFunc = (val: any): boolean => {
+    return (
+        val !== null &&
+        typeof val === 'object' &&
+        val.hasOwnProperty('type') &&
+        val.type === 'Closure' &&
+        val.funcType === 'StringType'
+    )
+}
+
+const isTypeMatch = (val: any, type: string): boolean => {
+    return (
+        val == unassigned || type === 'AnyType' ||
+        (type == 'StringType' && isString(val)) ||
+        (type == 'BoolType' && isBoolean(val)) ||
+        (type == 'IntType' && isInteger(val)) ||
+        (type == 'StringTypeFunction' && isStringFunc(val)) ||
+        (type == 'BoolTypeFunction' && isBoolFunc(val)) ||
+        (type == 'IntTypeFunction' && isIntFunc(val)) ||
+        (type === 'IntStarType' && isInteger(val) && 
+            (HEAP_TYPE[val] === TYPES['IntType'] || HEAP_TYPE[val] === TYPES['AnyType'])) ||
+        (type === 'BoolStarType' && isInteger(val) && 
+            (HEAP_TYPE[val] === TYPES['BoolType'] || HEAP_TYPE[val] === TYPES['AnyType']))
+    )
+}
+
+const assign = (lval: string, val: any, env: Pair<any, any>): void => {
     if (env == null) throw new Error('Unbound name: ' + lval)
     if (env[0].hasOwnProperty(lval)) {
         env[0][lval][1] = val
@@ -129,19 +148,30 @@ const assign = (lval: string, val: number, env: Pair<any, any>): void => {
     }
 }
 
-const scan = (stmts: any): Array<Pair<string, string>> => {
+const scanBlock = (stmts: any): Array<Pair<string, string>> => {
     const locals = []
     while (stmts.type != 'StatementEmpty') {
         const firstStatement = stmts.first
         if (firstStatement.type == 'DclStatement' || firstStatement.type == 'DclAssignment') {
-            locals.push(pair(firstStatement.d.id.text, firstStatement.d.t.type))
+            locals.push(pair(firstStatement.d.t.type, firstStatement.d.id.text))
         }
         stmts = stmts.rest
     }
     return locals
 }
 
-const lookup = (lval: string, env: Pair<any, any>): Pair<any, any> => {
+const scanProg = (node: any): Array<Pair<string, string>> => {
+    const functions: Array<Pair<string, string>> = []
+    while (node.type != 'MainProg') {
+        const funcName = node.fun.id.text
+        const funcType = node.fun.t.type + 'Function'
+        functions.push(pair(funcType, funcName))
+        node = node.prog
+    }
+    return functions
+}
+
+const lookup = (lval: string, env: Pair<any, any>): any => {
     if (env == null) {
         throw new Error('Unbound name: ' + lval)
     }
@@ -167,7 +197,7 @@ const extendEnvironment = (
     const new_frame = {}
 
     for (let i = 0; i < lvals.length; i++) {
-        new_frame[lvals[i][0]] = pair(lvals[i][1], vals[i])
+        new_frame[lvals[i][1]] = pair(lvals[i][0], vals[i])
     }
 
     return pair(new_frame, env)
@@ -415,7 +445,11 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     FunProg: function* (node: any, context: Context) {
-        throw new Error(`not supported yet: ${node.type}`)
+      const functionDefinitions: Array<Pair<string,string>> = scanProg(node)
+      for (let i = 0; i < functionDefinitions.length; i++) {
+          E[0][functionDefinitions[i][1]] = pair(functionDefinitions[i][0], undeclared)
+      }
+      push(A, node.prog, node.fun)
     },
 
     Lambda: function* (node: any, context: Context) {
@@ -455,11 +489,11 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     ArgsList: function* (node: any, context: Context) {
-        throw new Error(`not supported yet: ${node.type}`)
+        push(A, node.list)
     },
 
     ArgsEmpty: function* (node: any, context: Context) {
-        throw new Error(`not supported yet: ${node.type}`)
+        // Do Nothing
     },
 
     IdLvalue: function* (node: any, context: Context) {
@@ -475,15 +509,19 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     SingleArg: function* (node: any, context: Context) {
-        throw new Error(`not supported yet: ${node.type}`)
+        push(A, node.first)
     },
 
     MultiArgs: function* (node: any, context: Context) {
-        throw new Error(`not supported yet: ${node.type}`)
+        push(A, node.rest, node.first)
     },
 
     Assignment: function* (node: any, context: Context) {
         push(A, { type: 'Assignment_i' }, node.lv, node.val)
+    },
+
+    FunctionAssignment: function* (node: any, context: Context) {
+        push(A, {type:'FunctionAssignment_i', lv: node.lv}, node.val)
     },
 
     IfStatement: function* (node: any, context: Context) {
@@ -503,12 +541,12 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     DclAssignment: function* (node: any, context: Context) {
-        push(A,{type: 'Assignment', lv: { type: 'IdLvalue', id: node.d.id}, val: node.val}, node.d)
+        push(A,{ type: 'Assignment', lv: { type: 'IdLvalue', id: node.d.id}, val: node.val}, node.d)
     },
 
     ReturnStatement: function* (node: any, context: Context) {
         // TODO: Implement properly with functions
-        push(A, node.val)
+        push(A, { type: 'Reset_i'}, node.val)
     },
 
     FreeStatement: function* (node: any, context: Context) {
@@ -557,7 +595,19 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     FnExpr: function* (node: any, context: Context) {
-        throw new Error(`not supported yet: ${node.type}`)
+        // TODO: Implement parameter handling
+        let numArgs = 0
+        if (node.arglst.type !== 'ArgsEmpty') {
+            let args = node.arglst.list
+              while (args.type !== 'SingleArg') {
+                  numArgs++
+                  args = args.rest
+              }
+              numArgs++
+        }
+        push(A, {type: "FnExpr_i", arity: numArgs, funcName: node.id.text }, node.arglst)
+        const [_, fn_expr] = lookup(node.id.text, E)
+        push(S, fn_expr)
     },
 
     MallocExpr: function* (node: any, context: Context) {
@@ -572,20 +622,38 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
         push(A, { type: 'AmperSandExpr_i'}, node.first)
     },
 
-    Program: function* (node: any, context: Context) {
-        throw new Error(`not supported yet: ${node.type}`)
-    },
-
-    Main: function* (node: any, context: Context) {
-        throw new Error(`not supported yet: ${node.type}`)
-    },
-
     Function: function* (node: any, context: Context) {
-        throw new Error(`not supported yet: ${node.type}`)
+        assign(node.id.text, unassigned, E)
+        const params = []
+        if (node.prms.type === 'ParamsList') {
+            let paramsList = node.prms.list
+            while (paramsList.type !== 'SingleParam') {
+                const param = paramsList.first
+                params.push(pair(param.t, param.id.text))
+                paramsList = paramsList.rest
+            }
+            params.push(pair(paramsList.first.t, paramsList.first.id.text))
+        }
+        
+        push(A, { 
+            type: 'FunctionAssignment', 
+            lv: node.id.text, 
+            val: { 
+                type: 'Closure', 
+                funcName: node.id.text, 
+                funcType: node.t.type, 
+                prms: params, 
+                blk: node.blk, 
+                env: E
+            }})
+    },
+
+    Closure: function* (node: any, context: Context) {
+        push(S, node)
     },
 
     Block: function* (node: any, context: Context) {
-        const locals: Array<Pair<string,string>> = scan(node.stmnts)
+        const locals: Array<Pair<string,string>> = scanBlock(node.stmnts)
         const unDeclaredList: Array<any> = locals.map(_ => undeclared)
         if (!(A.length === 0)) {
             push(A, {type: 'Environment_i', env: E})
@@ -684,6 +752,10 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
         }
     },
 
+    FunctionAssignment_i: function* (node: any, context: Context) {
+      assign(node.lv, S.pop(), E)
+    },
+
     Environment_i: function* (node: any, context: Context) {
         E = node.env
     },
@@ -697,8 +769,57 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     While_i: function* (node: any, context: Context) {
-        if(S.pop()){
+        if (S.pop()) {
             push(A, node, node.pred, node.body)
+        }
+    },
+
+    FnExpr_i: function* (node: any, context: Context) {
+        const arity = node.arity
+        const args = []
+
+        for (let i = arity - 1; i >= 0; i--) {
+            args[i] = S.pop()
+        }
+        const func = S.pop()
+
+        if (A.length === 0 || peek(A).type === 'Environment_i') {
+            // Current E is not needed
+            push(A, { type: 'FnTypeCheck_i', funcType: func.funcType }, { type: 'Mark_i' })
+        } else if (peek(A).type === 'Reset_i') {
+            // Tail call case
+            A.pop()
+        } else {
+            push(A, { type: 'Environment_i', env: E }, { type: 'FnTypeCheck_i', funcName: func.funcName, funcType: func.funcType }, { type: 'Mark_i' })
+        }
+        push(A, func.blk)
+        
+        if (func.prms.length != args.length) {
+            throw new Error('Incorrect number of arguments provided to function ' + func.funcName)
+        }
+        let addresses = []
+        for (let i = 0; i < args.length; i++) {
+            if (!isTypeMatch(args[i], func.prms[i][0].type)) {
+                throw new Error('Parameter type mismatch for function ' + func.funcName + ': Parameter ' + func.prms[i][1] + ' should be of type ' + func.prms[i][0].type)
+            }
+            addresses[i] = heap_allocate(func.prms[i][0].type, type_sizes[func.prms[i][0].type])
+            heap_assign(func.prms[i][0].type, args[i], addresses[i])
+        }
+        E = extendEnvironment(func.prms, addresses, func.env)
+    },
+
+    FnTypeCheck_i: function* (node: any, context: Context) {
+        const retVal = peek(S)
+        if ((node.funcType == 'StringType' && !isString(retVal)) ||
+            (node.funcType == 'BoolType' && !isBoolean(retVal)) ||
+            (node.funcType == 'IntType' && !isInteger(retVal))) {
+            throw new Error('Type mismatch: Function ' + node.funcName + ' should return type ' + node.funcType)
+        }
+    },
+
+    Reset_i: function* (node: any, context: Context) {
+        if (A.length !== 0 && A.pop().type !== 'Mark_i') {
+            push(A, node)
         }
     },
 
@@ -729,14 +850,15 @@ export function* evaluate(node: es.Node, context: Context) {
         }
 
         // Debugging
-        // console.log('PRINTING A')
-        // console.log(A)
-        // console.log('PRINTING S')
-        // console.log(S)
-        // console.log('PRINTING E')
-        // console.log(E)
-        // console.log('PRINTING HEAP')
-        // console.log(HEAP)
+        console.log('PRINTING A')
+        console.log(A)
+        console.log('PRINTING S')
+        console.log(S)
+        console.log('PRINTING E')
+        console.log(E)
+        console.log('PRINTING HEAP')
+        console.log(HEAP)
+        console.log('------------------------------')
 
         const cmd = A.pop()
         yield* evaluators[cmd.type](cmd, context)

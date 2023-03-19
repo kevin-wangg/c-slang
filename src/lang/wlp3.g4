@@ -23,14 +23,14 @@ type: 'int' # IntType
 expr: INT # Int
     | BOOL # Bool
     | '(' inner=expr ')' # Parentheses
+    | '*' first=expr # StarExpr
+	| '&' first=lvalue # AmpersandExpr
 	| unop=unaryoperator first=expr # UnopExpr
-	| first=expr binop=binaryoperator second=expr #BinopExpr
-	| first=expr binlog=binarylogical second=expr #BinlogExpr
 	| id=ID # IdExpr
 	| id=ID '(' arglst=args ')' # FnExpr
 	| 'malloc' '(' first=expr ')' # MallocExpr
-	| '*' first=expr # StarExpr
-	| '&' first=lvalue # AmpersandExpr
+	| first=expr binop=binaryoperator second=expr #BinopExpr
+	| first=expr binlog=binarylogical second=expr #BinlogExpr
     ;
 statement: lv=lvalue '=' val=expr ';' # Assignment
        | 'if' '(' pred=predicate ')' cons=block 'else' alt=block # IfStatement
@@ -74,3 +74,4 @@ WS      : [ \t\r\n]+ -> skip ;
 INT     : [0-9]+ ;
 BOOL    : 'true' | 'false';
 ID: [a-zA-Z_][a-zA-Z_0-9]* ;
+
