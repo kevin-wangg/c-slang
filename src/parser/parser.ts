@@ -38,6 +38,7 @@ import {
     FunProgContext,
     IdExprContext,
     IdLvalueContext,
+    IfElseStatementContext,
     IfStatementContext,
     IntContext,
     IntStarTypeContext,
@@ -294,6 +295,13 @@ class ProgramGenerator implements wlp3Visitor<any> {
     visitIfStatement(ctx: IfStatementContext): any {
         return {
             type: 'IfStatement',
+            pred: this.visit(ctx._pred),
+            cons: this.visit(ctx._cons)
+        }
+    }
+    visitIfElseStatement(ctx: IfElseStatementContext): any {
+        return {
+            type: 'IfElseStatement',
             pred: this.visit(ctx._pred),
             cons: this.visit(ctx._cons),
             alt: this.visit(ctx._alt)
