@@ -23,6 +23,7 @@ import { SingleArgContext } from './wlp3Parser'
 import { MultiArgsContext } from './wlp3Parser'
 import { AssignmentContext } from './wlp3Parser'
 import { IfStatementContext } from './wlp3Parser'
+import { IfElseStatementContext } from './wlp3Parser'
 import { WhileStatementContext } from './wlp3Parser'
 import { PrintfStatementContext } from './wlp3Parser'
 import { DclStatementContext } from './wlp3Parser'
@@ -235,6 +236,14 @@ export interface wlp3Visitor<Result> extends ParseTreeVisitor<Result> {
      * @return the visitor result
      */
     visitIfStatement?: (ctx: IfStatementContext) => Result
+
+    /**
+     * Visit a parse tree produced by the `IfElseStatement`
+     * labeled alternative in `wlp3Parser.statement`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitIfElseStatement?: (ctx: IfElseStatementContext) => Result
 
     /**
      * Visit a parse tree produced by the `WhileStatement`

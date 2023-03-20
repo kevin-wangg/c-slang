@@ -528,6 +528,10 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     IfStatement: function* (node: any, context: Context) {
+        push(A, {type: 'Branch_i', cons: node.cons}, node.pred)
+    },
+
+    IfElseStatement: function* (node: any, context: Context) {
         push(A, {type: 'Branch_i', cons: node.cons, alt: node.alt}, node.pred)
     },
 
@@ -764,7 +768,11 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     Branch_i: function* (node: any, context: Context) {
-        push(A, S.pop() ? node.cons: node.alt)
+        if(S.pop()){
+            push(A, node.cons)
+        } else if(node.alt){
+            push(A, node.alt)
+        }
     },
 
     Pop_i: function* (node: any, context: Context) {

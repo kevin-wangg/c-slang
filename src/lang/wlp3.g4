@@ -33,7 +33,8 @@ expr: INT # Int
 	| first=expr binlog=binarylogical second=expr #BinlogExpr
     ;
 statement: lv=lvalue '=' val=expr ';' # Assignment
-       | 'if' '(' pred=predicate ')' cons=block 'else' alt=block # IfStatement
+       | 'if' '(' pred=predicate ')' cons=block # IfStatement
+         | 'if' '(' pred=predicate ')' cons=block 'else' alt=block # IfElseStatement
 	     | 'while' '(' pred=predicate ')' body=block # WhileStatement
 	     | 'printf' '(' body=expr ')' ';' # PrintfStatement
 	     | d=dcl ';' # DclStatement
