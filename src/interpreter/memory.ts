@@ -1,6 +1,6 @@
-import { isNumber, isBoolean } from 'lodash'
+import { isBoolean, isNumber } from 'lodash'
 
-import { isTypeMatch }  from './type_checking'
+import { isTypeMatch } from './type_checking'
 
 // Memory stuff
 //
@@ -176,4 +176,3 @@ export const heap_lookup = (env_addr: number) => {
         throw new Error(`${type} lookup in heap not yet supported`)
     }
 }
-

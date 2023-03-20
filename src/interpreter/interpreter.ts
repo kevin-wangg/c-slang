@@ -8,22 +8,18 @@ import { is_number } from '../stdlib/misc'
 import { Context, Environment, Value } from '../types'
 import { evaluateBinaryExpression, evaluateUnaryExpression } from '../utils/operators'
 import * as rttc from '../utils/rttc'
-
 import {
-    isTypeMatch,
-    isUndeclared,
-    undeclared,
-    unassigned
-} from './type_checking'
-
-import {
-    HEAP, HEAP_TYPE, type_sizes, REVERSE_TYPES,
-    initialize_machine, 
-    heap_assign,
-    heap_lookup,
+    HEAP,
     heap_allocate,
+    heap_assign,
     heap_deallocate,
+    heap_lookup,
+    HEAP_TYPE,
+    initialize_machine,
+    REVERSE_TYPES,
+    type_sizes
 } from './memory'
+import { isTypeMatch, isUndeclared, unassigned, undeclared } from './type_checking'
 
 class Thunk {
     public value: Value
