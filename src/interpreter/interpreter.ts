@@ -4,7 +4,6 @@ import { isBoolean, isInteger, isNumber, isString } from 'lodash'
 
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
 import { Pair, pair } from '../stdlib/list'
-import { is_number } from '../stdlib/misc'
 import { Context, Environment, Value } from '../types'
 import { evaluateBinaryExpression, evaluateUnaryExpression } from '../utils/operators'
 import * as rttc from '../utils/rttc'
