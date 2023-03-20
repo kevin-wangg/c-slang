@@ -12,10 +12,8 @@ import { ParamsListContext } from './wlp3Parser'
 import { ParamsEmptyContext } from './wlp3Parser'
 import { IntTypeContext } from './wlp3Parser'
 import { BoolTypeContext } from './wlp3Parser'
-import { StringTypeContext } from './wlp3Parser'
 import { IntStarTypeContext } from './wlp3Parser'
 import { BoolStarTypeContext } from './wlp3Parser'
-import { StringStarTypeContext } from './wlp3Parser'
 import { ArgsListContext } from './wlp3Parser'
 import { ArgsEmptyContext } from './wlp3Parser'
 import { IdLvalueContext } from './wlp3Parser'
@@ -33,17 +31,16 @@ import { ReturnStatementContext } from './wlp3Parser'
 import { FreeStatementContext } from './wlp3Parser'
 import { ExprStatementContext } from './wlp3Parser'
 import { IntContext } from './wlp3Parser'
-import { StringContext } from './wlp3Parser'
 import { BoolContext } from './wlp3Parser'
 import { ParenthesesContext } from './wlp3Parser'
+import { StarExprContext } from './wlp3Parser'
+import { AmpersandExprContext } from './wlp3Parser'
 import { UnopExprContext } from './wlp3Parser'
-import { BinopExprContext } from './wlp3Parser'
-import { BinlogExprContext } from './wlp3Parser'
 import { IdExprContext } from './wlp3Parser'
 import { FnExprContext } from './wlp3Parser'
 import { MallocExprContext } from './wlp3Parser'
-import { StarExprContext } from './wlp3Parser'
-import { AmpersandExprContext } from './wlp3Parser'
+import { BinopExprContext } from './wlp3Parser'
+import { BinlogExprContext } from './wlp3Parser'
 import { ProgramContext } from './wlp3Parser'
 import { MainContext } from './wlp3Parser'
 import { FunctionContext } from './wlp3Parser'
@@ -199,19 +196,6 @@ export interface wlp3Listener extends ParseTreeListener {
     exitBoolType?: (ctx: BoolTypeContext) => void
 
     /**
-     * Enter a parse tree produced by the `StringType`
-     * labeled alternative in `wlp3Parser.type`.
-     * @param ctx the parse tree
-     */
-    enterStringType?: (ctx: StringTypeContext) => void
-    /**
-     * Exit a parse tree produced by the `StringType`
-     * labeled alternative in `wlp3Parser.type`.
-     * @param ctx the parse tree
-     */
-    exitStringType?: (ctx: StringTypeContext) => void
-
-    /**
      * Enter a parse tree produced by the `IntStarType`
      * labeled alternative in `wlp3Parser.type`.
      * @param ctx the parse tree
@@ -236,19 +220,6 @@ export interface wlp3Listener extends ParseTreeListener {
      * @param ctx the parse tree
      */
     exitBoolStarType?: (ctx: BoolStarTypeContext) => void
-
-    /**
-     * Enter a parse tree produced by the `StringStarType`
-     * labeled alternative in `wlp3Parser.type`.
-     * @param ctx the parse tree
-     */
-    enterStringStarType?: (ctx: StringStarTypeContext) => void
-    /**
-     * Exit a parse tree produced by the `StringStarType`
-     * labeled alternative in `wlp3Parser.type`.
-     * @param ctx the parse tree
-     */
-    exitStringStarType?: (ctx: StringStarTypeContext) => void
 
     /**
      * Enter a parse tree produced by the `ArgsList`
@@ -472,19 +443,6 @@ export interface wlp3Listener extends ParseTreeListener {
     exitInt?: (ctx: IntContext) => void
 
     /**
-     * Enter a parse tree produced by the `String`
-     * labeled alternative in `wlp3Parser.expr`.
-     * @param ctx the parse tree
-     */
-    enterString?: (ctx: StringContext) => void
-    /**
-     * Exit a parse tree produced by the `String`
-     * labeled alternative in `wlp3Parser.expr`.
-     * @param ctx the parse tree
-     */
-    exitString?: (ctx: StringContext) => void
-
-    /**
      * Enter a parse tree produced by the `Bool`
      * labeled alternative in `wlp3Parser.expr`.
      * @param ctx the parse tree
@@ -511,6 +469,32 @@ export interface wlp3Listener extends ParseTreeListener {
     exitParentheses?: (ctx: ParenthesesContext) => void
 
     /**
+     * Enter a parse tree produced by the `StarExpr`
+     * labeled alternative in `wlp3Parser.expr`.
+     * @param ctx the parse tree
+     */
+    enterStarExpr?: (ctx: StarExprContext) => void
+    /**
+     * Exit a parse tree produced by the `StarExpr`
+     * labeled alternative in `wlp3Parser.expr`.
+     * @param ctx the parse tree
+     */
+    exitStarExpr?: (ctx: StarExprContext) => void
+
+    /**
+     * Enter a parse tree produced by the `AmpersandExpr`
+     * labeled alternative in `wlp3Parser.expr`.
+     * @param ctx the parse tree
+     */
+    enterAmpersandExpr?: (ctx: AmpersandExprContext) => void
+    /**
+     * Exit a parse tree produced by the `AmpersandExpr`
+     * labeled alternative in `wlp3Parser.expr`.
+     * @param ctx the parse tree
+     */
+    exitAmpersandExpr?: (ctx: AmpersandExprContext) => void
+
+    /**
      * Enter a parse tree produced by the `UnopExpr`
      * labeled alternative in `wlp3Parser.expr`.
      * @param ctx the parse tree
@@ -522,32 +506,6 @@ export interface wlp3Listener extends ParseTreeListener {
      * @param ctx the parse tree
      */
     exitUnopExpr?: (ctx: UnopExprContext) => void
-
-    /**
-     * Enter a parse tree produced by the `BinopExpr`
-     * labeled alternative in `wlp3Parser.expr`.
-     * @param ctx the parse tree
-     */
-    enterBinopExpr?: (ctx: BinopExprContext) => void
-    /**
-     * Exit a parse tree produced by the `BinopExpr`
-     * labeled alternative in `wlp3Parser.expr`.
-     * @param ctx the parse tree
-     */
-    exitBinopExpr?: (ctx: BinopExprContext) => void
-
-    /**
-     * Enter a parse tree produced by the `BinlogExpr`
-     * labeled alternative in `wlp3Parser.expr`.
-     * @param ctx the parse tree
-     */
-    enterBinlogExpr?: (ctx: BinlogExprContext) => void
-    /**
-     * Exit a parse tree produced by the `BinlogExpr`
-     * labeled alternative in `wlp3Parser.expr`.
-     * @param ctx the parse tree
-     */
-    exitBinlogExpr?: (ctx: BinlogExprContext) => void
 
     /**
      * Enter a parse tree produced by the `IdExpr`
@@ -589,30 +547,30 @@ export interface wlp3Listener extends ParseTreeListener {
     exitMallocExpr?: (ctx: MallocExprContext) => void
 
     /**
-     * Enter a parse tree produced by the `StarExpr`
+     * Enter a parse tree produced by the `BinopExpr`
      * labeled alternative in `wlp3Parser.expr`.
      * @param ctx the parse tree
      */
-    enterStarExpr?: (ctx: StarExprContext) => void
+    enterBinopExpr?: (ctx: BinopExprContext) => void
     /**
-     * Exit a parse tree produced by the `StarExpr`
+     * Exit a parse tree produced by the `BinopExpr`
      * labeled alternative in `wlp3Parser.expr`.
      * @param ctx the parse tree
      */
-    exitStarExpr?: (ctx: StarExprContext) => void
+    exitBinopExpr?: (ctx: BinopExprContext) => void
 
     /**
-     * Enter a parse tree produced by the `AmpersandExpr`
+     * Enter a parse tree produced by the `BinlogExpr`
      * labeled alternative in `wlp3Parser.expr`.
      * @param ctx the parse tree
      */
-    enterAmpersandExpr?: (ctx: AmpersandExprContext) => void
+    enterBinlogExpr?: (ctx: BinlogExprContext) => void
     /**
-     * Exit a parse tree produced by the `AmpersandExpr`
+     * Exit a parse tree produced by the `BinlogExpr`
      * labeled alternative in `wlp3Parser.expr`.
      * @param ctx the parse tree
      */
-    exitAmpersandExpr?: (ctx: AmpersandExprContext) => void
+    exitBinlogExpr?: (ctx: BinlogExprContext) => void
 
     /**
      * Enter a parse tree produced by `wlp3Parser.program`.

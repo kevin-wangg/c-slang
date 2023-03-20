@@ -17,23 +17,20 @@ paramlist: first=dcl # SingleParam
 dcl: t=type id=ID;
 type: 'int' # IntType
     | 'bool' # BoolType
-    | 'string' # StringType
     | 'int*' # IntStarType
     | 'bool*' # BoolStarType
-    | 'string*' # StringStarType
     ;
 expr: INT # Int
-    | STRING # String
     | BOOL # Bool
     | '(' inner=expr ')' # Parentheses
+    | '*' first=expr # StarExpr
+	| '&' first=lvalue # AmpersandExpr
 	| unop=unaryoperator first=expr # UnopExpr
-	| first=expr binop=binaryoperator second=expr #BinopExpr
-	| first=expr binlog=binarylogical second=expr #BinlogExpr
 	| id=ID # IdExpr
 	| id=ID '(' arglst=args ')' # FnExpr
 	| 'malloc' '(' first=expr ')' # MallocExpr
-	| '*' first=expr # StarExpr
-	| '&' first=expr # AmpersandExpr
+	| first=expr binop=binaryoperator second=expr #BinopExpr
+	| first=expr binlog=binarylogical second=expr #BinlogExpr
     ;
 statement: lv=lvalue '=' val=expr ';' # Assignment
        | 'if' '(' pred=predicate ')' cons=block 'else' alt=block # IfStatement
@@ -75,6 +72,6 @@ lvalue: id=ID # IdLvalue
 
 WS      : [ \t\r\n]+ -> skip ;
 INT     : [0-9]+ ;
-STRING  : '"'[a-zA-Z0-9]+'"' ;
 BOOL    : 'true' | 'false';
 ID: [a-zA-Z_][a-zA-Z_0-9]* ;
+

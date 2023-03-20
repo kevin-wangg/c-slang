@@ -23,11 +23,13 @@ import {
     BinopExprContext,
     BlockContext,
     BoolContext,
+    BoolStarTypeContext,
     BoolTypeContext,
     BracketLvalueContext,
     DclAssignmentContext,
     DclContext,
     DclStatementContext,
+    DerefAddressContext,
     ExprContext,
     ExprStatementContext,
     FnExprContext,
@@ -62,8 +64,6 @@ import {
     StatementEmptyContext,
     StatementListContext,
     StatementlistContext,
-    StringContext,
-    StringTypeContext,
     TypeContext,
     UnaryoperatorContext,
     UnopExprContext,
@@ -232,14 +232,14 @@ class ProgramGenerator implements wlp3Visitor<any> {
             type: 'BoolType'
         }
     }
-    visitStringType(ctx: StringTypeContext): any {
-        return {
-            type: 'StringType'
-        }
-    }
     visitIntStarType(ctx: IntStarTypeContext): any {
         return {
-            type: 'IntStarTypeContext'
+            type: 'IntStarType'
+        }
+    }
+    visitBoolStarType(ctx: BoolStarTypeContext): any {
+        return {
+            type: 'BoolStarType'
         }
     }
     visitArgsList(ctx: ArgsListContext): any {
@@ -276,6 +276,12 @@ class ProgramGenerator implements wlp3Visitor<any> {
             type: 'MultiArgs',
             first: this.visit(ctx._first),
             rest: this.visit(ctx._rest)
+        }
+    }
+    visitDerefAddress(ctx: DerefAddressContext): any {
+        return {
+            type: 'DerefAddress',
+            expr: this.visit(ctx._addr)
         }
     }
     visitAssignment(ctx: AssignmentContext): any {
@@ -348,12 +354,6 @@ class ProgramGenerator implements wlp3Visitor<any> {
         return {
             type: 'IntLiteral',
             val: parseInt(ctx.text)
-        }
-    }
-    visitString(ctx: StringContext): any {
-        return {
-            type: 'StringLiteral',
-            val: ctx.text
         }
     }
     visitBool(ctx: BoolContext): any {
@@ -545,8 +545,6 @@ export function parse(source: string, context: Context) {
         }
         const hasErrors = context.errors.find(m => m.severity === ErrorSeverity.ERROR)
         if (program && !hasErrors) {
-            console.log('wowowoer')
-            console.log(program)
             return program
         } else {
             return undefined

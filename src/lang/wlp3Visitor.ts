@@ -12,10 +12,8 @@ import { ParamsListContext } from './wlp3Parser'
 import { ParamsEmptyContext } from './wlp3Parser'
 import { IntTypeContext } from './wlp3Parser'
 import { BoolTypeContext } from './wlp3Parser'
-import { StringTypeContext } from './wlp3Parser'
 import { IntStarTypeContext } from './wlp3Parser'
 import { BoolStarTypeContext } from './wlp3Parser'
-import { StringStarTypeContext } from './wlp3Parser'
 import { ArgsListContext } from './wlp3Parser'
 import { ArgsEmptyContext } from './wlp3Parser'
 import { IdLvalueContext } from './wlp3Parser'
@@ -33,17 +31,16 @@ import { ReturnStatementContext } from './wlp3Parser'
 import { FreeStatementContext } from './wlp3Parser'
 import { ExprStatementContext } from './wlp3Parser'
 import { IntContext } from './wlp3Parser'
-import { StringContext } from './wlp3Parser'
 import { BoolContext } from './wlp3Parser'
 import { ParenthesesContext } from './wlp3Parser'
+import { StarExprContext } from './wlp3Parser'
+import { AmpersandExprContext } from './wlp3Parser'
 import { UnopExprContext } from './wlp3Parser'
-import { BinopExprContext } from './wlp3Parser'
-import { BinlogExprContext } from './wlp3Parser'
 import { IdExprContext } from './wlp3Parser'
 import { FnExprContext } from './wlp3Parser'
 import { MallocExprContext } from './wlp3Parser'
-import { StarExprContext } from './wlp3Parser'
-import { AmpersandExprContext } from './wlp3Parser'
+import { BinopExprContext } from './wlp3Parser'
+import { BinlogExprContext } from './wlp3Parser'
 import { ProgramContext } from './wlp3Parser'
 import { MainContext } from './wlp3Parser'
 import { FunctionContext } from './wlp3Parser'
@@ -152,14 +149,6 @@ export interface wlp3Visitor<Result> extends ParseTreeVisitor<Result> {
     visitBoolType?: (ctx: BoolTypeContext) => Result
 
     /**
-     * Visit a parse tree produced by the `StringType`
-     * labeled alternative in `wlp3Parser.type`.
-     * @param ctx the parse tree
-     * @return the visitor result
-     */
-    visitStringType?: (ctx: StringTypeContext) => Result
-
-    /**
      * Visit a parse tree produced by the `IntStarType`
      * labeled alternative in `wlp3Parser.type`.
      * @param ctx the parse tree
@@ -174,14 +163,6 @@ export interface wlp3Visitor<Result> extends ParseTreeVisitor<Result> {
      * @return the visitor result
      */
     visitBoolStarType?: (ctx: BoolStarTypeContext) => Result
-
-    /**
-     * Visit a parse tree produced by the `StringStarType`
-     * labeled alternative in `wlp3Parser.type`.
-     * @param ctx the parse tree
-     * @return the visitor result
-     */
-    visitStringStarType?: (ctx: StringStarTypeContext) => Result
 
     /**
      * Visit a parse tree produced by the `ArgsList`
@@ -320,14 +301,6 @@ export interface wlp3Visitor<Result> extends ParseTreeVisitor<Result> {
     visitInt?: (ctx: IntContext) => Result
 
     /**
-     * Visit a parse tree produced by the `String`
-     * labeled alternative in `wlp3Parser.expr`.
-     * @param ctx the parse tree
-     * @return the visitor result
-     */
-    visitString?: (ctx: StringContext) => Result
-
-    /**
      * Visit a parse tree produced by the `Bool`
      * labeled alternative in `wlp3Parser.expr`.
      * @param ctx the parse tree
@@ -344,28 +317,28 @@ export interface wlp3Visitor<Result> extends ParseTreeVisitor<Result> {
     visitParentheses?: (ctx: ParenthesesContext) => Result
 
     /**
+     * Visit a parse tree produced by the `StarExpr`
+     * labeled alternative in `wlp3Parser.expr`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitStarExpr?: (ctx: StarExprContext) => Result
+
+    /**
+     * Visit a parse tree produced by the `AmpersandExpr`
+     * labeled alternative in `wlp3Parser.expr`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitAmpersandExpr?: (ctx: AmpersandExprContext) => Result
+
+    /**
      * Visit a parse tree produced by the `UnopExpr`
      * labeled alternative in `wlp3Parser.expr`.
      * @param ctx the parse tree
      * @return the visitor result
      */
     visitUnopExpr?: (ctx: UnopExprContext) => Result
-
-    /**
-     * Visit a parse tree produced by the `BinopExpr`
-     * labeled alternative in `wlp3Parser.expr`.
-     * @param ctx the parse tree
-     * @return the visitor result
-     */
-    visitBinopExpr?: (ctx: BinopExprContext) => Result
-
-    /**
-     * Visit a parse tree produced by the `BinlogExpr`
-     * labeled alternative in `wlp3Parser.expr`.
-     * @param ctx the parse tree
-     * @return the visitor result
-     */
-    visitBinlogExpr?: (ctx: BinlogExprContext) => Result
 
     /**
      * Visit a parse tree produced by the `IdExpr`
@@ -392,20 +365,20 @@ export interface wlp3Visitor<Result> extends ParseTreeVisitor<Result> {
     visitMallocExpr?: (ctx: MallocExprContext) => Result
 
     /**
-     * Visit a parse tree produced by the `StarExpr`
+     * Visit a parse tree produced by the `BinopExpr`
      * labeled alternative in `wlp3Parser.expr`.
      * @param ctx the parse tree
      * @return the visitor result
      */
-    visitStarExpr?: (ctx: StarExprContext) => Result
+    visitBinopExpr?: (ctx: BinopExprContext) => Result
 
     /**
-     * Visit a parse tree produced by the `AmpersandExpr`
+     * Visit a parse tree produced by the `BinlogExpr`
      * labeled alternative in `wlp3Parser.expr`.
      * @param ctx the parse tree
      * @return the visitor result
      */
-    visitAmpersandExpr?: (ctx: AmpersandExprContext) => Result
+    visitBinlogExpr?: (ctx: BinlogExprContext) => Result
 
     /**
      * Visit a parse tree produced by `wlp3Parser.program`.
