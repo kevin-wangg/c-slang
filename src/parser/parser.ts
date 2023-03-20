@@ -26,6 +26,8 @@ import {
     BoolStarTypeContext,
     BoolTypeContext,
     BracketLvalueContext,
+    BreakStatementContext,
+    ContinueStatementContext,
     DclAssignmentContext,
     DclContext,
     DclStatementContext,
@@ -349,6 +351,16 @@ class ProgramGenerator implements wlp3Visitor<any> {
         return {
             type: 'ExprStatement',
             val: this.visit(ctx._val)
+        }
+    }
+    visitBreakStatement(ctx: BreakStatementContext): any {
+        return {
+            type: 'BreakStatement'
+        }
+    }
+    visitContinueStatement(ctx: ContinueStatementContext): any {
+        return {
+            type: 'ContinueStatement'
         }
     }
 

@@ -31,6 +31,8 @@ import { DclAssignmentContext } from './wlp3Parser'
 import { ReturnStatementContext } from './wlp3Parser'
 import { FreeStatementContext } from './wlp3Parser'
 import { ExprStatementContext } from './wlp3Parser'
+import { BreakStatementContext } from './wlp3Parser'
+import { ContinueStatementContext } from './wlp3Parser'
 import { IntContext } from './wlp3Parser'
 import { BoolContext } from './wlp3Parser'
 import { ParenthesesContext } from './wlp3Parser'
@@ -442,6 +444,32 @@ export interface wlp3Listener extends ParseTreeListener {
      * @param ctx the parse tree
      */
     exitExprStatement?: (ctx: ExprStatementContext) => void
+
+    /**
+     * Enter a parse tree produced by the `BreakStatement`
+     * labeled alternative in `wlp3Parser.statement`.
+     * @param ctx the parse tree
+     */
+    enterBreakStatement?: (ctx: BreakStatementContext) => void
+    /**
+     * Exit a parse tree produced by the `BreakStatement`
+     * labeled alternative in `wlp3Parser.statement`.
+     * @param ctx the parse tree
+     */
+    exitBreakStatement?: (ctx: BreakStatementContext) => void
+
+    /**
+     * Enter a parse tree produced by the `ContinueStatement`
+     * labeled alternative in `wlp3Parser.statement`.
+     * @param ctx the parse tree
+     */
+    enterContinueStatement?: (ctx: ContinueStatementContext) => void
+    /**
+     * Exit a parse tree produced by the `ContinueStatement`
+     * labeled alternative in `wlp3Parser.statement`.
+     * @param ctx the parse tree
+     */
+    exitContinueStatement?: (ctx: ContinueStatementContext) => void
 
     /**
      * Enter a parse tree produced by the `Int`

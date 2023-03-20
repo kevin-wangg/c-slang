@@ -31,6 +31,8 @@ import { DclAssignmentContext } from './wlp3Parser'
 import { ReturnStatementContext } from './wlp3Parser'
 import { FreeStatementContext } from './wlp3Parser'
 import { ExprStatementContext } from './wlp3Parser'
+import { BreakStatementContext } from './wlp3Parser'
+import { ContinueStatementContext } from './wlp3Parser'
 import { IntContext } from './wlp3Parser'
 import { BoolContext } from './wlp3Parser'
 import { ParenthesesContext } from './wlp3Parser'
@@ -300,6 +302,22 @@ export interface wlp3Visitor<Result> extends ParseTreeVisitor<Result> {
      * @return the visitor result
      */
     visitExprStatement?: (ctx: ExprStatementContext) => Result
+
+    /**
+     * Visit a parse tree produced by the `BreakStatement`
+     * labeled alternative in `wlp3Parser.statement`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitBreakStatement?: (ctx: BreakStatementContext) => Result
+
+    /**
+     * Visit a parse tree produced by the `ContinueStatement`
+     * labeled alternative in `wlp3Parser.statement`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitContinueStatement?: (ctx: ContinueStatementContext) => Result
 
     /**
      * Visit a parse tree produced by the `Int`

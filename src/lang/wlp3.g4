@@ -42,6 +42,8 @@ statement: lv=lvalue '=' val=expr ';' # Assignment
 	     | 'return' val=expr ';' # ReturnStatement
 	     | 'free' '(' val=expr ')' ';' # FreeStatement
        | val=expr ';'# ExprStatement
+       | 'break' ';' #BreakStatement
+       | 'continue' ';' #ContinueStatement
        ;
 args: list=arglist # ArgsList
     | <empty> # ArgsEmpty
