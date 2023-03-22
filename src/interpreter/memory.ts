@@ -21,7 +21,14 @@ export const TYPES = {
     AnyType: 5
 }
 
-export const REVERSE_TYPES = ['IntType', 'BoolType', 'CharType', 'IntStarType', 'BoolStarType', 'AnyType']
+export const REVERSE_TYPES = [
+    'IntType',
+    'BoolType',
+    'CharType',
+    'IntStarType',
+    'BoolStarType',
+    'AnyType'
+]
 
 export let HEAP: Uint8Array
 export let HEAP_TYPE: Uint8Array
@@ -79,12 +86,10 @@ export const heap_set = (addr: number, val: number) => {
     HEAP[addr] = val
 }
 
-export const heap_get_char = (addr: number) => {
-
-}
+export const heap_get_char = (addr: number) => {}
 
 export const heap_set_char = (addr: number, val: string) => {
-    // typescript doesn't have type for char, so we annotate with string type 
+    // typescript doesn't have type for char, so we annotate with string type
 }
 
 export const heap_get_bool = (addr: number) => {
