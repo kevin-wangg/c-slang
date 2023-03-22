@@ -6,6 +6,7 @@ import { isTypeMatch } from './type_checking'
 //
 export const type_sizes = {
     BoolType: 1,
+    CharType: 1,
     IntType: 4,
     IntStarType: 4,
     BoolStarType: 4
@@ -14,12 +15,13 @@ export const type_sizes = {
 export const TYPES = {
     IntType: 0,
     BoolType: 1,
-    IntStarType: 2,
-    BoolStarType: 3,
-    AnyType: 4
+    CharType: 2,
+    IntStarType: 3,
+    BoolStarType: 4,
+    AnyType: 5
 }
 
-export const REVERSE_TYPES = ['IntType', 'BoolType', 'IntStarType', 'BoolStarType', 'AnyType']
+export const REVERSE_TYPES = ['IntType', 'BoolType', 'CharType', 'IntStarType', 'BoolStarType', 'AnyType']
 
 export let HEAP: Uint8Array
 export let HEAP_TYPE: Uint8Array
@@ -58,7 +60,7 @@ export const heap_allocate = (type: string, bytes: number) => {
             i += HEAP[i]
         }
     }
-    return -1
+    throw new Error('Out of heap memory')
 }
 
 export const heap_deallocate = (addr: number) => {
@@ -75,6 +77,14 @@ export const heap_get = (addr: number) => {
 
 export const heap_set = (addr: number, val: number) => {
     HEAP[addr] = val
+}
+
+export const heap_get_char = (addr: number) => {
+
+}
+
+export const heap_set_char = (addr: number, val: string) => {
+    // typescript doesn't have type for char, so we annotate with string type 
 }
 
 export const heap_get_bool = (addr: number) => {

@@ -256,12 +256,20 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
         // Do Nothing
     },
 
+    CharType: function* (node: any, context: Context) {
+        // Do nothing
+    },
+
     IntStarType: function* (node: any, context: Context) {
         // Do Nothing
     },
 
     BoolStarType: function* (node: any, context: Context) {
         // Do Nothing
+    },
+
+    CharStarType: function* (node: any, context: Context) {
+        // Do nothing
     },
 
     ArgsList: function* (node: any, context: Context) {
@@ -354,6 +362,10 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     StringLiteral: function* (node: any, context: Context) {
+        push(S, node.val)
+    },
+
+    CharLiteral: function* (node: any, context: Context) {
         push(S, node.val)
     },
 
