@@ -1,4 +1,4 @@
-import { isBoolean, isNumber } from 'lodash'
+import { isBoolean, isNumber, isString } from 'lodash'
 
 import { isTypeMatch } from './type_checking'
 
@@ -6,20 +6,32 @@ import { isTypeMatch } from './type_checking'
 //
 export const type_sizes = {
     BoolType: 1,
+    CharType: 1,
     IntType: 4,
     IntStarType: 4,
-    BoolStarType: 4
+    BoolStarType: 4,
+    CharStarType: 4
 }
 
 export const TYPES = {
     IntType: 0,
     BoolType: 1,
-    IntStarType: 2,
-    BoolStarType: 3,
-    AnyType: 4
+    CharType: 2,
+    IntStarType: 3,
+    BoolStarType: 4,
+    CharStarType: 5,
+    AnyType: 6
 }
 
-export const REVERSE_TYPES = ['IntType', 'BoolType', 'IntStarType', 'BoolStarType', 'AnyType']
+export const REVERSE_TYPES = [
+    'IntType',
+    'BoolType',
+    'CharType',
+    'IntStarType',
+    'BoolStarType',
+    'CharStarType',
+    'AnyType'
+]
 
 export let HEAP: Uint8Array
 export let HEAP_TYPE: Uint8Array
@@ -58,7 +70,7 @@ export const heap_allocate = (type: string, bytes: number) => {
             i += HEAP[i]
         }
     }
-    return -1
+    throw new Error('Out of heap memory')
 }
 
 export const heap_deallocate = (addr: number) => {
@@ -75,6 +87,18 @@ export const heap_get = (addr: number) => {
 
 export const heap_set = (addr: number, val: number) => {
     HEAP[addr] = val
+}
+
+export const heap_get_char = (addr: number) => {
+    const byte = heap_get(addr)
+    return String.fromCharCode(byte)
+}
+
+export const heap_set_char = (addr: number, ch: string) => {
+    // typescript doesn't have type for char, so we annotate with string type
+    const ascii_val = ch.charCodeAt(0) // Get ascii code of character (assume string has length 1)
+    heap_set(addr, ascii_val)
+    HEAP_TYPE[addr] = TYPES['CharType']
 }
 
 export const heap_get_bool = (addr: number) => {
@@ -126,40 +150,33 @@ export const get_int_fourth_byte = (num: number) => {
     return num & 0x000000ff
 }
 
-export const heap_set_int_star = (addr: number, pointer: number) => {
+export const heap_set_pointer = (addr: number, pointer: number, type: string) => {
     heap_set(addr, get_int_first_byte(pointer))
     heap_set(addr + 1, get_int_second_byte(pointer))
     heap_set(addr + 2, get_int_third_byte(pointer))
     heap_set(addr + 3, get_int_fourth_byte(pointer))
-    HEAP_TYPE[addr] = TYPES['IntStarType']
-    HEAP_TYPE[addr + 1] = TYPES['IntStarType']
-    HEAP_TYPE[addr + 2] = TYPES['IntStarType']
-    HEAP_TYPE[addr + 3] = TYPES['IntStarType']
-}
-
-export const heap_set_bool_star = (addr: number, pointer: number) => {
-    heap_set(addr, get_int_first_byte(pointer))
-    heap_set(addr + 1, get_int_second_byte(pointer))
-    heap_set(addr + 2, get_int_third_byte(pointer))
-    heap_set(addr + 3, get_int_fourth_byte(pointer))
-    HEAP_TYPE[addr] = TYPES['BoolStarType']
-    HEAP_TYPE[addr + 1] = TYPES['BoolStarType']
-    HEAP_TYPE[addr + 2] = TYPES['BoolStarType']
-    HEAP_TYPE[addr + 3] = TYPES['BoolStarType']
+    HEAP_TYPE[addr] = TYPES[type]
+    HEAP_TYPE[addr + 1] = TYPES[type]
+    HEAP_TYPE[addr + 2] = TYPES[type]
+    HEAP_TYPE[addr + 3] = TYPES[type]
 }
 
 export const heap_assign = (type: string, val: any, env_addr: number) => {
     if (isTypeMatch(val, type)) {
         if (type === 'IntStarType') {
-            heap_set_int_star(env_addr, val)
+            heap_set_pointer(env_addr, val, 'IntStarType')
         } else if (type === 'BoolStarType') {
-            heap_set_bool_star(env_addr, val)
+            heap_set_pointer(env_addr, val, 'BoolStarType')
+        } else if (type === 'CharStarType') {
+            heap_set_pointer(env_addr, val, 'CharStarType')
+        } else if (isString(val) && val.length === 1) {
+            heap_set_char(env_addr, val)
         } else if (isNumber(val)) {
             heap_set_int(env_addr, val)
         } else if (isBoolean(val)) {
             heap_set_bool(env_addr, val)
         } else {
-            throw new Error('Variable type in heap not yet supported')
+            throw new Error(`Variable type in heap not yet supported: ${type}`)
         }
     } else {
         throw new Error(`Type mismatch: ${type} ${val}`)
@@ -168,10 +185,17 @@ export const heap_assign = (type: string, val: any, env_addr: number) => {
 
 export const heap_lookup = (env_addr: number) => {
     const type = HEAP_TYPE[env_addr]
-    if (type == TYPES['IntType'] || type == TYPES['IntStarType'] || type == TYPES['BoolStarType']) {
+    if (
+        type === TYPES['IntType'] ||
+        type === TYPES['IntStarType'] ||
+        type === TYPES['BoolStarType'] ||
+        type === TYPES['CharStarType']
+    ) {
         return heap_get_int(env_addr)
     } else if (type == TYPES['BoolType']) {
         return heap_get_bool(env_addr)
+    } else if (type === TYPES['CharType']) {
+        return heap_get_char(env_addr)
     } else {
         throw new Error(`${type} lookup in heap not yet supported`)
     }

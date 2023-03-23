@@ -7,8 +7,6 @@ import { TerminalNode } from 'antlr4ts/tree/TerminalNode'
 import * as es from 'estree'
 import { inspect } from 'util' // Debugging
 
-import { CalcLexer } from '../lang/CalcLexer'
-import { CalcParser } from '../lang/CalcParser'
 import { wlp3Lexer } from '../lang/wlp3Lexer'
 import {
     AmpersandExprContext,
@@ -27,6 +25,9 @@ import {
     BoolTypeContext,
     BracketLvalueContext,
     BreakStatementContext,
+    CharContext,
+    CharStarTypeContext,
+    CharTypeContext,
     ContinueStatementContext,
     DclAssignmentContext,
     DclContext,
@@ -235,6 +236,11 @@ class ProgramGenerator implements wlp3Visitor<any> {
             type: 'BoolType'
         }
     }
+    visitCharType(ctx: CharTypeContext): any {
+        return {
+            type: 'CharType'
+        }
+    }
     visitIntStarType(ctx: IntStarTypeContext): any {
         return {
             type: 'IntStarType'
@@ -243,6 +249,11 @@ class ProgramGenerator implements wlp3Visitor<any> {
     visitBoolStarType(ctx: BoolStarTypeContext): any {
         return {
             type: 'BoolStarType'
+        }
+    }
+    visitCharStarType(ctx: CharStarTypeContext): any {
+        return {
+            type: 'CharStarType'
         }
     }
     visitArgsList(ctx: ArgsListContext): any {
@@ -380,6 +391,12 @@ class ProgramGenerator implements wlp3Visitor<any> {
         return {
             type: 'BoolLiteral',
             val: ctx.text === 'true'
+        }
+    }
+    visitChar(ctx: CharContext): any {
+        return {
+            type: 'CharLiteral',
+            val: ctx.text.slice(1, -1) // remove the single quotes around the character
         }
     }
     visitUnopExpr(ctx: UnopExprContext): any {

@@ -17,11 +17,14 @@ paramlist: first=dcl # SingleParam
 dcl: t=type id=ID;
 type: 'int' # IntType
     | 'bool' # BoolType
+    | 'char' # CharType
     | 'int*' # IntStarType
     | 'bool*' # BoolStarType
+    | 'char*' # CharStarType
     ;
 expr: INT # Int
     | BOOL # Bool
+    | CHAR # Char
     | '(' inner=expr ')' # Parentheses
     | '*' first=expr # StarExpr
 	| '&' first=lvalue # AmpersandExpr
@@ -76,5 +79,6 @@ lvalue: id=ID # IdLvalue
 WS      : [ \t\r\n]+ -> skip ;
 INT     : [0-9]+ ;
 BOOL    : 'true' | 'false';
+CHAR    : '\''.'\'';
 ID: [a-zA-Z_][a-zA-Z_0-9]* ;
 

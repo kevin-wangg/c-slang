@@ -12,8 +12,10 @@ import { ParamsListContext } from './wlp3Parser'
 import { ParamsEmptyContext } from './wlp3Parser'
 import { IntTypeContext } from './wlp3Parser'
 import { BoolTypeContext } from './wlp3Parser'
+import { CharTypeContext } from './wlp3Parser'
 import { IntStarTypeContext } from './wlp3Parser'
 import { BoolStarTypeContext } from './wlp3Parser'
+import { CharStarTypeContext } from './wlp3Parser'
 import { ArgsListContext } from './wlp3Parser'
 import { ArgsEmptyContext } from './wlp3Parser'
 import { IdLvalueContext } from './wlp3Parser'
@@ -35,6 +37,7 @@ import { BreakStatementContext } from './wlp3Parser'
 import { ContinueStatementContext } from './wlp3Parser'
 import { IntContext } from './wlp3Parser'
 import { BoolContext } from './wlp3Parser'
+import { CharContext } from './wlp3Parser'
 import { ParenthesesContext } from './wlp3Parser'
 import { StarExprContext } from './wlp3Parser'
 import { AmpersandExprContext } from './wlp3Parser'
@@ -199,6 +202,19 @@ export interface wlp3Listener extends ParseTreeListener {
     exitBoolType?: (ctx: BoolTypeContext) => void
 
     /**
+     * Enter a parse tree produced by the `CharType`
+     * labeled alternative in `wlp3Parser.type`.
+     * @param ctx the parse tree
+     */
+    enterCharType?: (ctx: CharTypeContext) => void
+    /**
+     * Exit a parse tree produced by the `CharType`
+     * labeled alternative in `wlp3Parser.type`.
+     * @param ctx the parse tree
+     */
+    exitCharType?: (ctx: CharTypeContext) => void
+
+    /**
      * Enter a parse tree produced by the `IntStarType`
      * labeled alternative in `wlp3Parser.type`.
      * @param ctx the parse tree
@@ -223,6 +239,19 @@ export interface wlp3Listener extends ParseTreeListener {
      * @param ctx the parse tree
      */
     exitBoolStarType?: (ctx: BoolStarTypeContext) => void
+
+    /**
+     * Enter a parse tree produced by the `CharStarType`
+     * labeled alternative in `wlp3Parser.type`.
+     * @param ctx the parse tree
+     */
+    enterCharStarType?: (ctx: CharStarTypeContext) => void
+    /**
+     * Exit a parse tree produced by the `CharStarType`
+     * labeled alternative in `wlp3Parser.type`.
+     * @param ctx the parse tree
+     */
+    exitCharStarType?: (ctx: CharStarTypeContext) => void
 
     /**
      * Enter a parse tree produced by the `ArgsList`
@@ -496,6 +525,19 @@ export interface wlp3Listener extends ParseTreeListener {
      * @param ctx the parse tree
      */
     exitBool?: (ctx: BoolContext) => void
+
+    /**
+     * Enter a parse tree produced by the `Char`
+     * labeled alternative in `wlp3Parser.expr`.
+     * @param ctx the parse tree
+     */
+    enterChar?: (ctx: CharContext) => void
+    /**
+     * Exit a parse tree produced by the `Char`
+     * labeled alternative in `wlp3Parser.expr`.
+     * @param ctx the parse tree
+     */
+    exitChar?: (ctx: CharContext) => void
 
     /**
      * Enter a parse tree produced by the `Parentheses`
