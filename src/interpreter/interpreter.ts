@@ -8,7 +8,6 @@ import { Context, Environment, Value } from '../types'
 import { evaluateBinaryExpression, evaluateUnaryExpression } from '../utils/operators'
 import * as rttc from '../utils/rttc'
 import {
-    HEAP,
     heap_allocate,
     heap_assign,
     heap_deallocate,
@@ -675,15 +674,15 @@ export function* evaluate(node: es.Node, context: Context) {
         }
 
         // Debugging
-        console.log('PRINTING A')
-        console.log(A)
-        console.log('PRINTING S')
-        console.log(S)
-        console.log('PRINTING E')
-        console.log(E)
-        console.log('PRINTING HEAP')
-        console.log(HEAP)
-        console.log('------------------------------')
+        // console.log('PRINTING A')
+        // console.log(A)
+        // console.log('PRINTING S')
+        // console.log(S)
+        // console.log('PRINTING E')
+        // console.log(E)
+        // console.log('PRINTING HEAP')
+        // console.log(HEAP)
+        // console.log('------------------------------')
 
         const cmd = A.pop()
         yield* evaluators[cmd.type](cmd, context)
