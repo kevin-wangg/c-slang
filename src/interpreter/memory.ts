@@ -167,9 +167,9 @@ export const heap_assign = (type: string, val: any, env_addr: number) => {
             heap_set_pointer(env_addr, val, 'IntStarType')
         } else if (type === 'BoolStarType') {
             heap_set_pointer(env_addr, val, 'BoolStarType')
-        } else if(type === 'CharStarType') {
+        } else if (type === 'CharStarType') {
             heap_set_pointer(env_addr, val, 'CharStarType')
-        } else if(isString(val) && val.length === 1) {
+        } else if (isString(val) && val.length === 1) {
             heap_set_char(env_addr, val)
         } else if (isNumber(val)) {
             heap_set_int(env_addr, val)
@@ -185,12 +185,16 @@ export const heap_assign = (type: string, val: any, env_addr: number) => {
 
 export const heap_lookup = (env_addr: number) => {
     const type = HEAP_TYPE[env_addr]
-    if (type === TYPES['IntType'] || type === TYPES['IntStarType'] || 
-        type === TYPES['BoolStarType'] || type === TYPES['CharStarType']) {
+    if (
+        type === TYPES['IntType'] ||
+        type === TYPES['IntStarType'] ||
+        type === TYPES['BoolStarType'] ||
+        type === TYPES['CharStarType']
+    ) {
         return heap_get_int(env_addr)
     } else if (type == TYPES['BoolType']) {
         return heap_get_bool(env_addr)
-    } else if(type === TYPES['CharType']) {
+    } else if (type === TYPES['CharType']) {
         return heap_get_char(env_addr)
     } else {
         throw new Error(`${type} lookup in heap not yet supported`)

@@ -58,11 +58,14 @@ export const isTypeMatch = (val: any, type: string): boolean => {
         (type == 'StringTypeFunction' && isStringFunc(val)) ||
         (type == 'BoolTypeFunction' && isBoolFunc(val)) ||
         (type == 'IntTypeFunction' && isIntFunc(val)) ||
-        (type === 'IntStarType' && isInteger(val) &&
+        (type === 'IntStarType' &&
+            isInteger(val) &&
             (HEAP_TYPE[val] === TYPES['IntType'] || HEAP_TYPE[val] === TYPES['AnyType'])) ||
-        (type === 'BoolStarType' && isInteger(val) &&
+        (type === 'BoolStarType' &&
+            isInteger(val) &&
             (HEAP_TYPE[val] === TYPES['BoolType'] || HEAP_TYPE[val] === TYPES['AnyType'])) ||
-        (type === 'CharStarType' && isInteger(val) && 
+        (type === 'CharStarType' &&
+            isInteger(val) &&
             (HEAP_TYPE[val] === TYPES['CharType'] || HEAP_TYPE[val] === TYPES['AnyType']))
     )
 }
