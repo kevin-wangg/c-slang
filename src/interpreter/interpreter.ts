@@ -465,7 +465,6 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     Dcl: function* (node: any, context: Context) {
-        // const addr = heap_allocate(node.t.type, type_sizes[node.t.type])
         const addr = stack_allocate(node.t.type, type_sizes[node.t.type])
         assign(node.id.text, addr, E)
     },
@@ -610,7 +609,6 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
             if (!isTypeMatch(args[i], func.prms[i][0].type)) {
                 throw new Error('Parameter type mismatch for function ' + func.funcName + ': Parameter ' + func.prms[i][1] + ' should be of type ' + func.prms[i][0].type)
             }
-            // addresses[i] = heap_allocate(func.prms[i][0].type, type_sizes[func.prms[i][0].type])
             addresses[i] = stack_allocate(func.prms[i][0].type, type_sizes[func.prms[i][0].type])
             heap_assign(func.prms[i][0].type, args[i], addresses[i])
         }
