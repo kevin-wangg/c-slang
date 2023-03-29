@@ -35,9 +35,11 @@ export const REVERSE_TYPES = [
 
 export let HEAP: Uint8Array
 export let HEAP_TYPE: Uint8Array
-export let heap_size: number
+let heap_size: number
+let heap_start: number
+let stack_pointer: number
 
-export const heap_make = (bytes: number) => {
+const heap_make = (bytes: number) => {
     const data = new ArrayBuffer(bytes) // By default every value is initialized to 0
     const view = new Uint8Array(data)
     return view
@@ -47,10 +49,33 @@ export const initialize_machine = (heapsize_bytes: number) => {
     HEAP = heap_make(heapsize_bytes)
     HEAP_TYPE = heap_make(heapsize_bytes)
     heap_size = heapsize_bytes
+    heap_start = Math.floor(heapsize_bytes / 2)
+    stack_pointer = 0
+}
+
+export const stack_allocate = (type: string, bytes: number) => {
+    if (stack_pointer + bytes >= heap_start) {
+        throw new Error('Stack overflow')
+    }
+    heap_set(stack_pointer, bytes)
+    const ret = stack_pointer + 1
+    for (let i = stack_pointer + 1; i <= stack_pointer + bytes; ++i) {
+        HEAP_TYPE[i] = TYPES[type]
+    }
+    stack_pointer += bytes + 1 // increase stack pointer by # of bytes + 1
+    return ret
+}
+
+export const set_stack_pointer = (addr: number) => {
+    stack_pointer = addr
+}
+
+export const get_stack_pointer = () => {
+    return stack_pointer
 }
 
 export const heap_allocate = (type: string, bytes: number) => {
-    for (let i = 0; i < heap_size; ++i) {
+    for (let i = heap_start; i < heap_size; ++i) {
         if (HEAP[i] == 0) {
             let ok = true
             for (let j = i; j <= i + bytes; ++j) {
@@ -81,27 +106,27 @@ export const heap_deallocate = (addr: number) => {
     }
 }
 
-export const heap_get = (addr: number) => {
+const heap_get = (addr: number) => {
     return HEAP[addr]
 }
 
-export const heap_set = (addr: number, val: number) => {
+const heap_set = (addr: number, val: number) => {
     HEAP[addr] = val
 }
 
-export const heap_get_char = (addr: number) => {
+const heap_get_char = (addr: number) => {
     const byte = heap_get(addr)
     return String.fromCharCode(byte)
 }
 
-export const heap_set_char = (addr: number, ch: string) => {
+const heap_set_char = (addr: number, ch: string) => {
     // typescript doesn't have type for char, so we annotate with string type
     const ascii_val = ch.charCodeAt(0) // Get ascii code of character (assume string has length 1)
     heap_set(addr, ascii_val)
     HEAP_TYPE[addr] = TYPES['CharType']
 }
 
-export const heap_get_bool = (addr: number) => {
+const heap_get_bool = (addr: number) => {
     const byte = heap_get(addr)
     if (byte === 1) {
         return true
@@ -109,13 +134,13 @@ export const heap_get_bool = (addr: number) => {
     return false
 }
 
-export const heap_set_bool = (addr: number, b: boolean) => {
+const heap_set_bool = (addr: number, b: boolean) => {
     const val = b ? 1 : 0
     heap_set(addr, val)
     HEAP_TYPE[addr] = TYPES['BoolType']
 }
 
-export const heap_get_int = (addr: number) => {
+const heap_get_int = (addr: number) => {
     const first_byte = heap_get(addr)
     const second_byte = heap_get(addr + 1)
     const third_byte = heap_get(addr + 2)
@@ -123,7 +148,7 @@ export const heap_get_int = (addr: number) => {
     return (first_byte << 24) | (second_byte << 16) | (third_byte << 8) | fourth_byte
 }
 
-export const heap_set_int = (addr: number, num: number) => {
+const heap_set_int = (addr: number, num: number) => {
     heap_set(addr, get_int_first_byte(num))
     heap_set(addr + 1, get_int_second_byte(num))
     heap_set(addr + 2, get_int_third_byte(num))
@@ -134,23 +159,23 @@ export const heap_set_int = (addr: number, num: number) => {
     HEAP_TYPE[addr + 3] = TYPES['IntType']
 }
 
-export const get_int_first_byte = (num: number) => {
+const get_int_first_byte = (num: number) => {
     return (num & 0xff000000) >> 24
 }
 
-export const get_int_second_byte = (num: number) => {
+const get_int_second_byte = (num: number) => {
     return (num & 0x00ff0000) >> 16
 }
 
-export const get_int_third_byte = (num: number) => {
+const get_int_third_byte = (num: number) => {
     return (num & 0x0000ff00) >> 8
 }
 
-export const get_int_fourth_byte = (num: number) => {
+const get_int_fourth_byte = (num: number) => {
     return num & 0x000000ff
 }
 
-export const heap_set_pointer = (addr: number, pointer: number, type: string) => {
+const heap_set_pointer = (addr: number, pointer: number, type: string) => {
     heap_set(addr, get_int_first_byte(pointer))
     heap_set(addr + 1, get_int_second_byte(pointer))
     heap_set(addr + 2, get_int_third_byte(pointer))
@@ -197,6 +222,6 @@ export const heap_lookup = (env_addr: number) => {
     } else if (type === TYPES['CharType']) {
         return heap_get_char(env_addr)
     } else {
-        throw new Error(`${type} lookup in heap not yet supported`)
     }
+    throw new Error(`${type} lookup in heap not yet supported`)
 }
