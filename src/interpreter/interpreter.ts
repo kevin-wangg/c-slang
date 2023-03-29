@@ -663,7 +663,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 // and whose tail is an environment.
 const global_frame = {}
 const global_environment = null
-const step_limit = 10000000000
+const step_limit = 100000
 
 export function* evaluate(node: es.Node, context: Context) {
     A = []
@@ -671,7 +671,7 @@ export function* evaluate(node: es.Node, context: Context) {
     S = []
     E = pair(global_frame, global_environment)
 
-    initialize_machine(100000)
+    initialize_machine(1000) // start program with 1000 bytes of memory
 
     let i = 0
     while (i < step_limit) {
