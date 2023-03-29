@@ -671,7 +671,7 @@ export function* evaluate(node: es.Node, context: Context) {
     S = []
     E = pair(global_frame, global_environment)
 
-    initialize_machine(2147483648) // start program with 2GB of memory
+    initialize_machine(100000) // start program with 2GB of memory
 
     let i = 0
     while (i < step_limit) {

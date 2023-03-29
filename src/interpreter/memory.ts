@@ -54,15 +54,15 @@ export const initialize_machine = (heapsize_bytes: number) => {
 }
 
 export const stack_allocate = (type: string, bytes: number) => {
-    if(stack_pointer + bytes >= heap_start) {
+    if (stack_pointer + bytes >= heap_start) {
         throw new Error('Stack overflow')
     }
     heap_set(stack_pointer, bytes)
     const ret = stack_pointer + 1
-    for(let i = stack_pointer + 1; i <= stack_pointer + bytes; ++i) {
+    for (let i = stack_pointer + 1; i <= stack_pointer + bytes; ++i) {
         HEAP_TYPE[i] = TYPES[type]
     }
-    stack_pointer += (bytes + 1) // increase stack pointer by # of bytes + 1
+    stack_pointer += bytes + 1 // increase stack pointer by # of bytes + 1
     return ret
 }
 
