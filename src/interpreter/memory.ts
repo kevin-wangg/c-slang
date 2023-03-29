@@ -13,7 +13,7 @@ export const type_sizes = {
     CharStarType: 4
 }
 
-const TYPES = {
+export const TYPES = {
     IntType: 0,
     BoolType: 1,
     CharType: 2,
@@ -36,6 +36,8 @@ export const REVERSE_TYPES = [
 export let HEAP: Uint8Array
 export let HEAP_TYPE: Uint8Array
 let heap_size: number
+let heap_start: number
+let stack_pointer: number
 
 const heap_make = (bytes: number) => {
     const data = new ArrayBuffer(bytes) // By default every value is initialized to 0
@@ -47,10 +49,33 @@ export const initialize_machine = (heapsize_bytes: number) => {
     HEAP = heap_make(heapsize_bytes)
     HEAP_TYPE = heap_make(heapsize_bytes)
     heap_size = heapsize_bytes
+    heap_start = Math.floor(heapsize_bytes / 2)
+    stack_pointer = 0
+}
+
+export const stack_allocate = (type: string, bytes: number) => {
+    if(stack_pointer + bytes >= heap_start) {
+        throw new Error('Stack overflow')
+    }
+    heap_set(stack_pointer, bytes)
+    const ret = stack_pointer + 1
+    for(let i = stack_pointer + 1; i <= stack_pointer + bytes; ++i) {
+        HEAP_TYPE[i] = TYPES[type]
+    }
+    stack_pointer += (bytes + 1) // increase stack pointer by # of bytes + 1
+    return ret
+}
+
+export const set_stack_pointer = (addr: number) => {
+    stack_pointer = addr
+}
+
+export const get_stack_pointer = () => {
+    return stack_pointer
 }
 
 export const heap_allocate = (type: string, bytes: number) => {
-    for (let i = 0; i < heap_size; ++i) {
+    for (let i = heap_start; i < heap_size; ++i) {
         if (HEAP[i] == 0) {
             let ok = true
             for (let j = i; j <= i + bytes; ++j) {
@@ -197,6 +222,6 @@ export const heap_lookup = (env_addr: number) => {
     } else if (type === TYPES['CharType']) {
         return heap_get_char(env_addr)
     } else {
-        throw new Error(`${type} lookup in heap not yet supported`)
     }
+    throw new Error(`${type} lookup in heap not yet supported`)
 }

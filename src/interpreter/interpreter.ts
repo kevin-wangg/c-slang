@@ -8,6 +8,7 @@ import { Context, Environment, Value } from '../types'
 import { evaluateBinaryExpression, evaluateUnaryExpression } from '../utils/operators'
 import * as rttc from '../utils/rttc'
 import {
+    get_stack_pointer,
     heap_allocate,
     heap_assign,
     heap_deallocate,
@@ -15,6 +16,8 @@ import {
     HEAP_TYPE,
     initialize_machine,
     REVERSE_TYPES,
+    set_stack_pointer,
+    stack_allocate,
     type_sizes
 } from './memory'
 import { isTypeMatch, isUndeclared, unassigned, undeclared } from './type_checking'
@@ -455,14 +458,15 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
         const locals: Array<Pair<string,string>> = scanBlock(node.stmnts)
         const unDeclaredList: Array<any> = locals.map(_ => undeclared)
         if (!(A.length === 0)) {
-            push(A, {type: 'Environment_i', env: E})
+            push(A, {type: 'Environment_i', env: E, sp: get_stack_pointer() })
         }
         push(A, node.stmnts)
         E = extendEnvironment(locals, unDeclaredList, E)
     },
 
     Dcl: function* (node: any, context: Context) {
-        const addr = heap_allocate(node.t.type, type_sizes[node.t.type])
+        // const addr = heap_allocate(node.t.type, type_sizes[node.t.type])
+        const addr = stack_allocate(node.t.type, type_sizes[node.t.type])
         assign(node.id.text, addr, E)
     },
 
@@ -557,6 +561,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
     Environment_i: function* (node: any, context: Context) {
         E = node.env
+        set_stack_pointer(node.sp)
     },
 
     Branch_i: function* (node: any, context: Context) {
@@ -593,7 +598,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
             // Tail call case
             A.pop()
         } else {
-            push(A, { type: 'Environment_i', env: E }, { type: 'FnTypeCheck_i', funcName: func.funcName, funcType: func.funcType }, { type: 'Mark_i' })
+            push(A, { type: 'Environment_i', env: E, sp: get_stack_pointer() }, { type: 'FnTypeCheck_i', funcName: func.funcName, funcType: func.funcType }, { type: 'Mark_i' })
         }
         push(A, func.blk)
         
@@ -605,7 +610,8 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
             if (!isTypeMatch(args[i], func.prms[i][0].type)) {
                 throw new Error('Parameter type mismatch for function ' + func.funcName + ': Parameter ' + func.prms[i][1] + ' should be of type ' + func.prms[i][0].type)
             }
-            addresses[i] = heap_allocate(func.prms[i][0].type, type_sizes[func.prms[i][0].type])
+            // addresses[i] = heap_allocate(func.prms[i][0].type, type_sizes[func.prms[i][0].type])
+            addresses[i] = stack_allocate(func.prms[i][0].type, type_sizes[func.prms[i][0].type])
             heap_assign(func.prms[i][0].type, args[i], addresses[i])
         }
         E = extendEnvironment(func.prms, addresses, func.env)
@@ -665,7 +671,7 @@ export function* evaluate(node: es.Node, context: Context) {
     S = []
     E = pair(global_frame, global_environment)
 
-    initialize_machine(1000000) // start program with 10000 bytes of memory
+    initialize_machine(2147483648) // start program with 2GB of memory
 
     let i = 0
     while (i < step_limit) {
