@@ -475,8 +475,6 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
             throw new Error("Global variable " + varName + " has already been declared")
         }
         E[0][varName] = pair(varType, undeclared)
-        console.log("PRINTING NODE")
-        console.log(node)
         if (node.val.type != 'IntLiteral' && node.val.type != 'BoolLiteral' && node.val.type != 'CharLiteral') {
             throw new Error("Global variable declaration must be of type Int, Bool, or Char")
         }
