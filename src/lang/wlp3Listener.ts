@@ -23,13 +23,11 @@ import { BracketLvalueContext } from './wlp3Parser'
 import { DerefAddressContext } from './wlp3Parser'
 import { SingleArgContext } from './wlp3Parser'
 import { MultiArgsContext } from './wlp3Parser'
-import { AssignmentContext } from './wlp3Parser'
 import { IfStatementContext } from './wlp3Parser'
 import { IfElseStatementContext } from './wlp3Parser'
 import { WhileStatementContext } from './wlp3Parser'
 import { PrintfStatementContext } from './wlp3Parser'
 import { DclStatementContext } from './wlp3Parser'
-import { DclAssignmentContext } from './wlp3Parser'
 import { ReturnStatementContext } from './wlp3Parser'
 import { FreeStatementContext } from './wlp3Parser'
 import { ExprStatementContext } from './wlp3Parser'
@@ -47,6 +45,8 @@ import { FnExprContext } from './wlp3Parser'
 import { MallocExprContext } from './wlp3Parser'
 import { BinopExprContext } from './wlp3Parser'
 import { BinlogExprContext } from './wlp3Parser'
+import { AssignmentContext } from './wlp3Parser'
+import { DclAssignmentContext } from './wlp3Parser'
 import { ProgramContext } from './wlp3Parser'
 import { MainContext } from './wlp3Parser'
 import { FunctionContext } from './wlp3Parser'
@@ -345,19 +345,6 @@ export interface wlp3Listener extends ParseTreeListener {
     exitMultiArgs?: (ctx: MultiArgsContext) => void
 
     /**
-     * Enter a parse tree produced by the `Assignment`
-     * labeled alternative in `wlp3Parser.statement`.
-     * @param ctx the parse tree
-     */
-    enterAssignment?: (ctx: AssignmentContext) => void
-    /**
-     * Exit a parse tree produced by the `Assignment`
-     * labeled alternative in `wlp3Parser.statement`.
-     * @param ctx the parse tree
-     */
-    exitAssignment?: (ctx: AssignmentContext) => void
-
-    /**
      * Enter a parse tree produced by the `IfStatement`
      * labeled alternative in `wlp3Parser.statement`.
      * @param ctx the parse tree
@@ -421,19 +408,6 @@ export interface wlp3Listener extends ParseTreeListener {
      * @param ctx the parse tree
      */
     exitDclStatement?: (ctx: DclStatementContext) => void
-
-    /**
-     * Enter a parse tree produced by the `DclAssignment`
-     * labeled alternative in `wlp3Parser.statement`.
-     * @param ctx the parse tree
-     */
-    enterDclAssignment?: (ctx: DclAssignmentContext) => void
-    /**
-     * Exit a parse tree produced by the `DclAssignment`
-     * labeled alternative in `wlp3Parser.statement`.
-     * @param ctx the parse tree
-     */
-    exitDclAssignment?: (ctx: DclAssignmentContext) => void
 
     /**
      * Enter a parse tree produced by the `ReturnStatement`
@@ -655,6 +629,32 @@ export interface wlp3Listener extends ParseTreeListener {
      * @param ctx the parse tree
      */
     exitBinlogExpr?: (ctx: BinlogExprContext) => void
+
+    /**
+     * Enter a parse tree produced by the `Assignment`
+     * labeled alternative in `wlp3Parser.expr`.
+     * @param ctx the parse tree
+     */
+    enterAssignment?: (ctx: AssignmentContext) => void
+    /**
+     * Exit a parse tree produced by the `Assignment`
+     * labeled alternative in `wlp3Parser.expr`.
+     * @param ctx the parse tree
+     */
+    exitAssignment?: (ctx: AssignmentContext) => void
+
+    /**
+     * Enter a parse tree produced by the `DclAssignment`
+     * labeled alternative in `wlp3Parser.expr`.
+     * @param ctx the parse tree
+     */
+    enterDclAssignment?: (ctx: DclAssignmentContext) => void
+    /**
+     * Exit a parse tree produced by the `DclAssignment`
+     * labeled alternative in `wlp3Parser.expr`.
+     * @param ctx the parse tree
+     */
+    exitDclAssignment?: (ctx: DclAssignmentContext) => void
 
     /**
      * Enter a parse tree produced by `wlp3Parser.program`.

@@ -105,16 +105,21 @@ const scanBlock = (stmts: any): Array<Pair<string, string>> => {
     const locals = []
     while (stmts.type != 'StatementEmpty') {
         const firstStatement = stmts.first
-        if (firstStatement.type == 'DclStatement' || firstStatement.type == 'DclAssignment') {
+        if (firstStatement.type === 'DclStatement') {
             locals.push(pair(firstStatement.d.t.type, firstStatement.d.id.text))
+        } else if (
+            firstStatement.type === 'ExprStatement' &&
+            firstStatement.val.type === 'DclAssignment'
+        ) {
+            locals.push(pair(firstStatement.val.d.t.type, firstStatement.val.d.id.text))
         }
         stmts = stmts.rest
     }
     return locals
 }
 
+const functions: Array<Pair<string, string>> = []
 const scanProg = (node: any): Array<Pair<string, string>> => {
-    const functions: Array<Pair<string, string>> = []
     while (node.type != 'MainProg') {
         const funcName = node.fun.id.text
         const funcType = node.fun.t.type + 'Function'
@@ -331,7 +336,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     DclAssignment: function* (node: any, context: Context) {
-        push(A,{ type: 'Assignment', lv: { type: 'IdLvalue', id: node.d.id}, val: node.val}, node.d)
+        push(A, { type: 'Assignment', lv: { type: 'IdLvalue', id: node.d.id}, val: node.val }, node.d)
     },
 
     ReturnStatement: function* (node: any, context: Context) {
@@ -532,7 +537,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
     Assignment_i: function* (node: any, context: Context) {
         const lvalue = S.pop()
-        const new_val = S.pop()
+        const new_val = peek(S)
         if(isNumber(lvalue)) {
             // Lvalue is address (dereference address)
             const type = REVERSE_TYPES[HEAP_TYPE[lvalue]]

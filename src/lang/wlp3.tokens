@@ -57,11 +57,11 @@ ID=43
 '&'=14
 'malloc'=15
 '='=16
-';'=17
-'if'=18
-'else'=19
-'while'=20
-'printf'=21
+'if'=17
+'else'=18
+'while'=19
+'printf'=20
+';'=21
 'return'=22
 'free'=23
 'break'=24
