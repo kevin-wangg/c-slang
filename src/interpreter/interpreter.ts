@@ -113,17 +113,6 @@ const scanBlock = (stmts: any): Array<Pair<string, string>> => {
     return locals
 }
 
-const scanProg = (node: any): Array<Pair<string, string>> => {
-    const functions: Array<Pair<string, string>> = []
-    while (node.type != 'MainProg') {
-        const funcName = node.fun.id.text
-        const funcType = node.fun.t.type + 'Function'
-        functions.push(pair(funcType, funcName))
-        node = node.prog
-    }
-    return functions
-}
-
 const lookup = (lval: string, env: Pair<any, any>): any => {
     if (env == null) {
         throw new Error('Unbound name: ' + lval)
@@ -223,11 +212,10 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     FunProg: function* (node: any, context: Context) {
-      const functionDefinitions: Array<Pair<string,string>> = scanProg(node)
-      for (let i = 0; i < functionDefinitions.length; i++) {
-          E[0][functionDefinitions[i][1]] = pair(functionDefinitions[i][0], undeclared)
-      }
-      push(A, node.prog, node.fun)
+        const funcName = node.fun.id.text
+        const funcType = node.fun.t.type + 'Function'
+        E[0][funcName] = pair(funcType, undeclared)
+        push(A, node.prog, node.fun)
     },
 
     Lambda: function* (node: any, context: Context) {
@@ -397,7 +385,6 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     FnExpr: function* (node: any, context: Context) {
-        // TODO: Implement parameter handling
         let numArgs = 0
         if (node.arglst.type !== 'ArgsEmpty') {
             let args = node.arglst.list
@@ -471,6 +458,25 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
     Predicate: function* (node: any, context: Context) {
         push(A, node.pred)
+    },
+
+    GlobVarDcl: function* (node: any, context: Context) {
+        const varName = node.glob.id.text
+        const varType = node.glob.t.type
+        E[0][varName] = pair(varType, undeclared)
+        push(A, node.prog, node.glob)
+    },
+
+    GlobVarDclAssignment: function* (node: any, context: Context) {
+        const varName = node.glob.id.text
+        const varType = node.glob.t.type
+        E[0][varName] = pair(varType, undeclared)
+        console.log("PRINTING NODE")
+        console.log(node)
+        if (node.val.type != 'IntLiteral' && node.val.type != 'BoolLiteral' && node.val.type != 'CharLiteral') {
+            throw new Error("Global variable declaration must be of type Int, Bool, or Char")
+        }
+        push(A, node.prog, { type: 'Assignment', lv: { type: 'IdLvalue', id: node.glob.id}, val: node.val}, node.glob)
     },
 
     // Instructions
@@ -678,15 +684,15 @@ export function* evaluate(node: es.Node, context: Context) {
         }
 
         // Debugging
-        // console.log('PRINTING A')
-        // console.log(A)
-        // console.log('PRINTING S')
-        // console.log(S)
-        // console.log('PRINTING E')
-        // console.log(E)
+        console.log('PRINTING A')
+        console.log(A)
+        console.log('PRINTING S')
+        console.log(S)
+        console.log('PRINTING E')
+        console.log(E)
         // console.log('PRINTING HEAP')
         // console.log(HEAP)
-        // console.log('------------------------------')
+        console.log('------------------------------')
 
         const cmd = A.pop()
         yield* evaluators[cmd.type](cmd, context)

@@ -36,7 +36,7 @@
     "dist"
   ],
   "bin": {
-    "wlp3": "dist/repl/repl.js"
+    "calc-slang": "dist/repl/repl.js"
   },
   "scripts": {
     "antlr4ts": "antlr4ts -visitor ./src/lang/wlp3.g4",

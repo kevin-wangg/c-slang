@@ -1,10 +1,13 @@
 grammar wlp3;		
-program: fun=function prog=program # FunProg
-       | mn=main # MainProg
-       ;
+program: glob=dcl ';' prog=program # GlobVarDcl
+    | glob=dcl '=' val=expr ';' prog=program  # GlobVarDclAssignment
+    | fun=function prog=program # FunProg
+    | mn=main # MainProg
+    ;
 main:   'int' 'main' '(' ')' blk=block ;
 function : t=type id=ID '(' prms=params ')' blk=block ;
-block: '{' stmnts=statementlist '}' ;
+block: '{' stmnts=statementlist '}'
+    ;
 statementlist: first=statement rest=statementlist # StatementList
     | <empty> # StatementEmpty
     ;
@@ -13,7 +16,7 @@ params: list=paramlist # ParamsList
       ;
 paramlist: first=dcl # SingleParam
     | first=dcl ',' rest=paramlist # MultiParam
-        ;
+    ;
 dcl: t=type id=ID;
 type: 'int' # IntType
     | 'bool' # BoolType

@@ -39,6 +39,8 @@ import {
     FreeStatementContext,
     FunctionContext,
     FunProgContext,
+    GlobVarDclAssignmentContext,
+    GlobVarDclContext,
     IdExprContext,
     IdLvalueContext,
     IfElseStatementContext,
@@ -213,6 +215,23 @@ class ProgramGenerator implements wlp3Visitor<any> {
         return {
             type: 'MainProg',
             mn: this.visit(ctx._mn)
+        }
+    }
+
+    visitGlobVarDcl(ctx: GlobVarDclContext): any {
+        return {
+            type: 'GlobVarDcl',
+            glob: this.visit(ctx._glob),
+            prog: this.visit(ctx._prog)
+        }
+    }
+
+    visitGlobVarDclAssignment(ctx: GlobVarDclAssignmentContext): any {
+        return {
+            type: 'GlobVarDclAssignment',
+            glob: this.visit(ctx._glob),
+            val: this.visit(ctx._val),
+            prog: this.visit(ctx._prog)
         }
     }
     visitParamsList(ctx: ParamsListContext): any {
