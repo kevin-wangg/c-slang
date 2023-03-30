@@ -40,6 +40,7 @@ expr: INT # Int
 statement: 'if' '(' pred=predicate ')' cons=block # IfStatement
          | 'if' '(' pred=predicate ')' cons=block 'else' alt=block # IfElseStatement
 	     | 'while' '(' pred=predicate ')' body=block # WhileStatement
+         | 'for' '(' first=expr ';' pred=expr ';' repeat=expr ')' body=block # ForStatement
 	     | 'printf' '(' body=expr ')' ';' # PrintfStatement
 	     | d=dcl ';' # DclStatement
 	     | 'return' val=expr ';' # ReturnStatement

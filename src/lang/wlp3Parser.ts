@@ -2,24 +2,25 @@
 
 import { ATN } from 'antlr4ts/atn/ATN'
 import { ATNDeserializer } from 'antlr4ts/atn/ATNDeserializer'
-import { ParserATNSimulator } from 'antlr4ts/atn/ParserATNSimulator'
-import { NotNull } from 'antlr4ts/Decorators'
-import { Override } from 'antlr4ts/Decorators'
 import { FailedPredicateException } from 'antlr4ts/FailedPredicateException'
-import * as Utils from 'antlr4ts/misc/Utils'
+import { NotNull } from 'antlr4ts/Decorators'
 import { NoViableAltException } from 'antlr4ts/NoViableAltException'
+import { Override } from 'antlr4ts/Decorators'
 import { Parser } from 'antlr4ts/Parser'
 import { ParserRuleContext } from 'antlr4ts/ParserRuleContext'
-import { RecognitionException } from 'antlr4ts/RecognitionException'
-import { RuleContext } from 'antlr4ts/RuleContext'
-import { Token } from 'antlr4ts/Token'
-import { TokenStream } from 'antlr4ts/TokenStream'
+import { ParserATNSimulator } from 'antlr4ts/atn/ParserATNSimulator'
 import { ParseTreeListener } from 'antlr4ts/tree/ParseTreeListener'
 import { ParseTreeVisitor } from 'antlr4ts/tree/ParseTreeVisitor'
+import { RecognitionException } from 'antlr4ts/RecognitionException'
+import { RuleContext } from 'antlr4ts/RuleContext'
 //import { RuleVersion } from "antlr4ts/RuleVersion";
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode'
+import { Token } from 'antlr4ts/Token'
+import { TokenStream } from 'antlr4ts/TokenStream'
 import { Vocabulary } from 'antlr4ts/Vocabulary'
 import { VocabularyImpl } from 'antlr4ts/VocabularyImpl'
+
+import * as Utils from 'antlr4ts/misc/Utils'
 
 import { wlp3Listener } from './wlp3Listener'
 import { wlp3Visitor } from './wlp3Visitor'
@@ -63,11 +64,12 @@ export class wlp3Parser extends Parser {
     public static readonly T__35 = 36
     public static readonly T__36 = 37
     public static readonly T__37 = 38
-    public static readonly WS = 39
-    public static readonly INT = 40
-    public static readonly BOOL = 41
-    public static readonly CHAR = 42
-    public static readonly ID = 43
+    public static readonly T__38 = 39
+    public static readonly WS = 40
+    public static readonly INT = 41
+    public static readonly BOOL = 42
+    public static readonly CHAR = 43
+    public static readonly ID = 44
     public static readonly RULE_program = 0
     public static readonly RULE_main = 1
     public static readonly RULE_function = 2
@@ -129,8 +131,9 @@ export class wlp3Parser extends Parser {
         "'if'",
         "'else'",
         "'while'",
-        "'printf'",
+        "'for'",
         "';'",
+        "'printf'",
         "'return'",
         "'free'",
         "'break'",
@@ -150,6 +153,7 @@ export class wlp3Parser extends Parser {
         "'!'"
     ]
     private static readonly _SYMBOLIC_NAMES: Array<string | undefined> = [
+        undefined,
         undefined,
         undefined,
         undefined,
@@ -277,7 +281,7 @@ export class wlp3Parser extends Parser {
     }
     // @RuleVersion(0)
     public main(): MainContext {
-        const _localctx: MainContext = new MainContext(this._ctx, this.state)
+        let _localctx: MainContext = new MainContext(this._ctx, this.state)
         this.enterRule(_localctx, 2, wlp3Parser.RULE_main)
         try {
             this.enterOuterAlt(_localctx, 1)
@@ -308,7 +312,7 @@ export class wlp3Parser extends Parser {
     }
     // @RuleVersion(0)
     public function(): FunctionContext {
-        const _localctx: FunctionContext = new FunctionContext(this._ctx, this.state)
+        let _localctx: FunctionContext = new FunctionContext(this._ctx, this.state)
         this.enterRule(_localctx, 4, wlp3Parser.RULE_function)
         try {
             this.enterOuterAlt(_localctx, 1)
@@ -341,7 +345,7 @@ export class wlp3Parser extends Parser {
     }
     // @RuleVersion(0)
     public block(): BlockContext {
-        const _localctx: BlockContext = new BlockContext(this._ctx, this.state)
+        let _localctx: BlockContext = new BlockContext(this._ctx, this.state)
         this.enterRule(_localctx, 6, wlp3Parser.RULE_block)
         try {
             this.enterOuterAlt(_localctx, 1)
@@ -391,7 +395,8 @@ export class wlp3Parser extends Parser {
                 case wlp3Parser.T__22:
                 case wlp3Parser.T__23:
                 case wlp3Parser.T__24:
-                case wlp3Parser.T__37:
+                case wlp3Parser.T__25:
+                case wlp3Parser.T__38:
                 case wlp3Parser.INT:
                 case wlp3Parser.BOOL:
                 case wlp3Parser.CHAR:
@@ -517,7 +522,7 @@ export class wlp3Parser extends Parser {
     }
     // @RuleVersion(0)
     public dcl(): DclContext {
-        const _localctx: DclContext = new DclContext(this._ctx, this.state)
+        let _localctx: DclContext = new DclContext(this._ctx, this.state)
         this.enterRule(_localctx, 14, wlp3Parser.RULE_dcl)
         try {
             this.enterOuterAlt(_localctx, 1)
@@ -621,11 +626,11 @@ export class wlp3Parser extends Parser {
             _p = 0
         }
 
-        const _parentctx: ParserRuleContext = this._ctx
-        const _parentState: number = this.state
+        let _parentctx: ParserRuleContext = this._ctx
+        let _parentState: number = this.state
         let _localctx: ExprContext = new ExprContext(this._ctx, _parentState)
         let _prevctx: ExprContext = _localctx
-        const _startState: number = 18
+        let _startState: number = 18
         this.enterRecursionRule(_localctx, 18, wlp3Parser.RULE_expr, _p)
         try {
             let _alt: number
@@ -874,7 +879,7 @@ export class wlp3Parser extends Parser {
         let _localctx: StatementContext = new StatementContext(this._ctx, this.state)
         this.enterRule(_localctx, 20, wlp3Parser.RULE_statement)
         try {
-            this.state = 182
+            this.state = 192
             this._errHandler.sync(this)
             switch (this.interpreter.adaptivePredict(this._input, 8, this._ctx)) {
                 case 1:
@@ -933,7 +938,7 @@ export class wlp3Parser extends Parser {
                     break
 
                 case 4:
-                    _localctx = new PrintfStatementContext(_localctx)
+                    _localctx = new ForStatementContext(_localctx)
                     this.enterOuterAlt(_localctx, 4)
                     {
                         this.state = 156
@@ -941,84 +946,109 @@ export class wlp3Parser extends Parser {
                         this.state = 157
                         this.match(wlp3Parser.T__2)
                         this.state = 158
-                        ;(_localctx as PrintfStatementContext)._body = this.expr(0)
+                        ;(_localctx as ForStatementContext)._first = this.expr(0)
                         this.state = 159
-                        this.match(wlp3Parser.T__3)
-                        this.state = 160
                         this.match(wlp3Parser.T__20)
+                        this.state = 160
+                        ;(_localctx as ForStatementContext)._pred = this.expr(0)
+                        this.state = 161
+                        this.match(wlp3Parser.T__20)
+                        this.state = 162
+                        ;(_localctx as ForStatementContext)._repeat = this.expr(0)
+                        this.state = 163
+                        this.match(wlp3Parser.T__3)
+                        this.state = 164
+                        ;(_localctx as ForStatementContext)._body = this.block()
                     }
                     break
 
                 case 5:
-                    _localctx = new DclStatementContext(_localctx)
+                    _localctx = new PrintfStatementContext(_localctx)
                     this.enterOuterAlt(_localctx, 5)
                     {
-                        this.state = 162
-                        ;(_localctx as DclStatementContext)._d = this.dcl()
-                        this.state = 163
+                        this.state = 166
+                        this.match(wlp3Parser.T__21)
+                        this.state = 167
+                        this.match(wlp3Parser.T__2)
+                        this.state = 168
+                        ;(_localctx as PrintfStatementContext)._body = this.expr(0)
+                        this.state = 169
+                        this.match(wlp3Parser.T__3)
+                        this.state = 170
                         this.match(wlp3Parser.T__20)
                     }
                     break
 
                 case 6:
-                    _localctx = new ReturnStatementContext(_localctx)
+                    _localctx = new DclStatementContext(_localctx)
                     this.enterOuterAlt(_localctx, 6)
                     {
-                        this.state = 165
-                        this.match(wlp3Parser.T__21)
-                        this.state = 166
-                        ;(_localctx as ReturnStatementContext)._val = this.expr(0)
-                        this.state = 167
-                        this.match(wlp3Parser.T__20)
-                    }
-                    break
-
-                case 7:
-                    _localctx = new FreeStatementContext(_localctx)
-                    this.enterOuterAlt(_localctx, 7)
-                    {
-                        this.state = 169
-                        this.match(wlp3Parser.T__22)
-                        this.state = 170
-                        this.match(wlp3Parser.T__2)
-                        this.state = 171
-                        ;(_localctx as FreeStatementContext)._val = this.expr(0)
                         this.state = 172
-                        this.match(wlp3Parser.T__3)
+                        ;(_localctx as DclStatementContext)._d = this.dcl()
                         this.state = 173
                         this.match(wlp3Parser.T__20)
                     }
                     break
 
-                case 8:
-                    _localctx = new ExprStatementContext(_localctx)
-                    this.enterOuterAlt(_localctx, 8)
+                case 7:
+                    _localctx = new ReturnStatementContext(_localctx)
+                    this.enterOuterAlt(_localctx, 7)
                     {
                         this.state = 175
-                        ;(_localctx as ExprStatementContext)._val = this.expr(0)
+                        this.match(wlp3Parser.T__22)
                         this.state = 176
+                        ;(_localctx as ReturnStatementContext)._val = this.expr(0)
+                        this.state = 177
+                        this.match(wlp3Parser.T__20)
+                    }
+                    break
+
+                case 8:
+                    _localctx = new FreeStatementContext(_localctx)
+                    this.enterOuterAlt(_localctx, 8)
+                    {
+                        this.state = 179
+                        this.match(wlp3Parser.T__23)
+                        this.state = 180
+                        this.match(wlp3Parser.T__2)
+                        this.state = 181
+                        ;(_localctx as FreeStatementContext)._val = this.expr(0)
+                        this.state = 182
+                        this.match(wlp3Parser.T__3)
+                        this.state = 183
                         this.match(wlp3Parser.T__20)
                     }
                     break
 
                 case 9:
-                    _localctx = new BreakStatementContext(_localctx)
+                    _localctx = new ExprStatementContext(_localctx)
                     this.enterOuterAlt(_localctx, 9)
                     {
-                        this.state = 178
-                        this.match(wlp3Parser.T__23)
-                        this.state = 179
+                        this.state = 185
+                        ;(_localctx as ExprStatementContext)._val = this.expr(0)
+                        this.state = 186
                         this.match(wlp3Parser.T__20)
                     }
                     break
 
                 case 10:
-                    _localctx = new ContinueStatementContext(_localctx)
+                    _localctx = new BreakStatementContext(_localctx)
                     this.enterOuterAlt(_localctx, 10)
                     {
-                        this.state = 180
+                        this.state = 188
                         this.match(wlp3Parser.T__24)
-                        this.state = 181
+                        this.state = 189
+                        this.match(wlp3Parser.T__20)
+                    }
+                    break
+
+                case 11:
+                    _localctx = new ContinueStatementContext(_localctx)
+                    this.enterOuterAlt(_localctx, 11)
+                    {
+                        this.state = 190
+                        this.match(wlp3Parser.T__25)
+                        this.state = 191
                         this.match(wlp3Parser.T__20)
                     }
                     break
@@ -1041,7 +1071,7 @@ export class wlp3Parser extends Parser {
         let _localctx: ArgsContext = new ArgsContext(this._ctx, this.state)
         this.enterRule(_localctx, 22, wlp3Parser.RULE_args)
         try {
-            this.state = 186
+            this.state = 196
             this._errHandler.sync(this)
             switch (this._input.LA(1)) {
                 case wlp3Parser.T__0:
@@ -1054,7 +1084,7 @@ export class wlp3Parser extends Parser {
                 case wlp3Parser.T__12:
                 case wlp3Parser.T__13:
                 case wlp3Parser.T__14:
-                case wlp3Parser.T__37:
+                case wlp3Parser.T__38:
                 case wlp3Parser.INT:
                 case wlp3Parser.BOOL:
                 case wlp3Parser.CHAR:
@@ -1062,7 +1092,7 @@ export class wlp3Parser extends Parser {
                     _localctx = new ArgsListContext(_localctx)
                     this.enterOuterAlt(_localctx, 1)
                     {
-                        this.state = 184
+                        this.state = 194
                         ;(_localctx as ArgsListContext)._list = this.arglist()
                     }
                     break
@@ -1094,14 +1124,14 @@ export class wlp3Parser extends Parser {
         let _localctx: ArglistContext = new ArglistContext(this._ctx, this.state)
         this.enterRule(_localctx, 24, wlp3Parser.RULE_arglist)
         try {
-            this.state = 193
+            this.state = 203
             this._errHandler.sync(this)
             switch (this.interpreter.adaptivePredict(this._input, 10, this._ctx)) {
                 case 1:
                     _localctx = new SingleArgContext(_localctx)
                     this.enterOuterAlt(_localctx, 1)
                     {
-                        this.state = 188
+                        this.state = 198
                         ;(_localctx as SingleArgContext)._first = this.expr(0)
                     }
                     break
@@ -1110,11 +1140,11 @@ export class wlp3Parser extends Parser {
                     _localctx = new MultiArgsContext(_localctx)
                     this.enterOuterAlt(_localctx, 2)
                     {
-                        this.state = 189
+                        this.state = 199
                         ;(_localctx as MultiArgsContext)._first = this.expr(0)
-                        this.state = 190
+                        this.state = 200
                         this.match(wlp3Parser.T__6)
-                        this.state = 191
+                        this.state = 201
                         ;(_localctx as MultiArgsContext)._rest = this.arglist()
                     }
                     break
@@ -1134,20 +1164,19 @@ export class wlp3Parser extends Parser {
     }
     // @RuleVersion(0)
     public binaryoperator(): BinaryoperatorContext {
-        const _localctx: BinaryoperatorContext = new BinaryoperatorContext(this._ctx, this.state)
+        let _localctx: BinaryoperatorContext = new BinaryoperatorContext(this._ctx, this.state)
         this.enterRule(_localctx, 26, wlp3Parser.RULE_binaryoperator)
         let _la: number
         try {
             this.enterOuterAlt(_localctx, 1)
             {
-                this.state = 195
+                this.state = 205
                 _la = this._input.LA(1)
                 if (
                     !(
                         ((_la - 13) & ~0x1f) === 0 &&
                         ((1 << (_la - 13)) &
                             ((1 << (wlp3Parser.T__12 - 13)) |
-                                (1 << (wlp3Parser.T__25 - 13)) |
                                 (1 << (wlp3Parser.T__26 - 13)) |
                                 (1 << (wlp3Parser.T__27 - 13)) |
                                 (1 << (wlp3Parser.T__28 - 13)) |
@@ -1156,7 +1185,8 @@ export class wlp3Parser extends Parser {
                                 (1 << (wlp3Parser.T__31 - 13)) |
                                 (1 << (wlp3Parser.T__32 - 13)) |
                                 (1 << (wlp3Parser.T__33 - 13)) |
-                                (1 << (wlp3Parser.T__34 - 13)))) !==
+                                (1 << (wlp3Parser.T__34 - 13)) |
+                                (1 << (wlp3Parser.T__35 - 13)))) !==
                             0
                     )
                 ) {
@@ -1185,15 +1215,15 @@ export class wlp3Parser extends Parser {
     }
     // @RuleVersion(0)
     public binarylogical(): BinarylogicalContext {
-        const _localctx: BinarylogicalContext = new BinarylogicalContext(this._ctx, this.state)
+        let _localctx: BinarylogicalContext = new BinarylogicalContext(this._ctx, this.state)
         this.enterRule(_localctx, 28, wlp3Parser.RULE_binarylogical)
         let _la: number
         try {
             this.enterOuterAlt(_localctx, 1)
             {
-                this.state = 197
+                this.state = 207
                 _la = this._input.LA(1)
-                if (!(_la === wlp3Parser.T__35 || _la === wlp3Parser.T__36)) {
+                if (!(_la === wlp3Parser.T__36 || _la === wlp3Parser.T__37)) {
                     this._errHandler.recoverInline(this)
                 } else {
                     if (this._input.LA(1) === Token.EOF) {
@@ -1219,13 +1249,13 @@ export class wlp3Parser extends Parser {
     }
     // @RuleVersion(0)
     public unaryoperator(): UnaryoperatorContext {
-        const _localctx: UnaryoperatorContext = new UnaryoperatorContext(this._ctx, this.state)
+        let _localctx: UnaryoperatorContext = new UnaryoperatorContext(this._ctx, this.state)
         this.enterRule(_localctx, 30, wlp3Parser.RULE_unaryoperator)
         try {
             this.enterOuterAlt(_localctx, 1)
             {
-                this.state = 199
-                this.match(wlp3Parser.T__37)
+                this.state = 209
+                this.match(wlp3Parser.T__38)
             }
         } catch (re) {
             if (re instanceof RecognitionException) {
@@ -1242,12 +1272,12 @@ export class wlp3Parser extends Parser {
     }
     // @RuleVersion(0)
     public predicate(): PredicateContext {
-        const _localctx: PredicateContext = new PredicateContext(this._ctx, this.state)
+        let _localctx: PredicateContext = new PredicateContext(this._ctx, this.state)
         this.enterRule(_localctx, 32, wlp3Parser.RULE_predicate)
         try {
             this.enterOuterAlt(_localctx, 1)
             {
-                this.state = 201
+                this.state = 211
                 _localctx._pred = this.expr(0)
             }
         } catch (re) {
@@ -1268,14 +1298,14 @@ export class wlp3Parser extends Parser {
         let _localctx: LvalueContext = new LvalueContext(this._ctx, this.state)
         this.enterRule(_localctx, 34, wlp3Parser.RULE_lvalue)
         try {
-            this.state = 210
+            this.state = 220
             this._errHandler.sync(this)
             switch (this._input.LA(1)) {
                 case wlp3Parser.ID:
                     _localctx = new IdLvalueContext(_localctx)
                     this.enterOuterAlt(_localctx, 1)
                     {
-                        this.state = 203
+                        this.state = 213
                         ;(_localctx as IdLvalueContext)._id = this.match(wlp3Parser.ID)
                     }
                     break
@@ -1283,11 +1313,11 @@ export class wlp3Parser extends Parser {
                     _localctx = new BracketLvalueContext(_localctx)
                     this.enterOuterAlt(_localctx, 2)
                     {
-                        this.state = 204
+                        this.state = 214
                         this.match(wlp3Parser.T__2)
-                        this.state = 205
+                        this.state = 215
                         ;(_localctx as BracketLvalueContext)._lv = this.lvalue()
-                        this.state = 206
+                        this.state = 216
                         this.match(wlp3Parser.T__3)
                     }
                     break
@@ -1295,9 +1325,9 @@ export class wlp3Parser extends Parser {
                     _localctx = new DerefAddressContext(_localctx)
                     this.enterOuterAlt(_localctx, 3)
                     {
-                        this.state = 208
+                        this.state = 218
                         this.match(wlp3Parser.T__12)
-                        this.state = 209
+                        this.state = 219
                         ;(_localctx as DerefAddressContext)._addr = this.expr(0)
                     }
                     break
@@ -1337,7 +1367,7 @@ export class wlp3Parser extends Parser {
     }
 
     public static readonly _serializedATN: string =
-        '\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241\x03-\xD7\x04\x02' +
+        '\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241\x03.\xE1\x04\x02' +
         '\t\x02\x04\x03\t\x03\x04\x04\t\x04\x04\x05\t\x05\x04\x06\t\x06\x04\x07' +
         '\t\x07\x04\b\t\b\x04\t\t\t\x04\n\t\n\x04\v\t\v\x04\f\t\f\x04\r\t\r\x04' +
         '\x0E\t\x0E\x04\x0F\t\x0F\x04\x10\t\x10\x04\x11\t\x11\x04\x12\t\x12\x04' +
@@ -1354,80 +1384,84 @@ export class wlp3Parser extends Parser {
         '\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03' +
         '\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03' +
         '\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03' +
-        '\f\x03\f\x03\f\x03\f\x03\f\x05\f\xB9\n\f\x03\r\x03\r\x05\r\xBD\n\r\x03' +
-        '\x0E\x03\x0E\x03\x0E\x03\x0E\x03\x0E\x05\x0E\xC4\n\x0E\x03\x0F\x03\x0F' +
-        '\x03\x10\x03\x10\x03\x11\x03\x11\x03\x12\x03\x12\x03\x13\x03\x13\x03\x13' +
-        '\x03\x13\x03\x13\x03\x13\x03\x13\x05\x13\xD5\n\x13\x03\x13\x02\x02\x03' +
-        '\x14\x14\x02\x02\x04\x02\x06\x02\b\x02\n\x02\f\x02\x0E\x02\x10\x02\x12' +
-        '\x02\x14\x02\x16\x02\x18\x02\x1A\x02\x1C\x02\x1E\x02 \x02"\x02$\x02\x02' +
-        "\x04\x04\x02\x0F\x0F\x1C%\x03\x02&'\x02\xE7\x02*\x03\x02\x02\x02\x04" +
-        ',\x03\x02\x02\x02\x062\x03\x02\x02\x02\b9\x03\x02\x02\x02\nA\x03\x02\x02' +
-        '\x02\fE\x03\x02\x02\x02\x0EL\x03\x02\x02\x02\x10N\x03\x02\x02\x02\x12' +
-        'W\x03\x02\x02\x02\x14{\x03\x02\x02\x02\x16\xB8\x03\x02\x02\x02\x18\xBC' +
-        '\x03\x02\x02\x02\x1A\xC3\x03\x02\x02\x02\x1C\xC5\x03\x02\x02\x02\x1E\xC7' +
-        '\x03\x02\x02\x02 \xC9\x03\x02\x02\x02"\xCB\x03\x02\x02\x02$\xD4\x03\x02' +
-        "\x02\x02&'\x05\x06\x04\x02'(\x05\x02\x02\x02(+\x03\x02\x02\x02)+\x05" +
-        '\x04\x03\x02*&\x03\x02\x02\x02*)\x03\x02\x02\x02+\x03\x03\x02\x02\x02' +
-        ',-\x07\x03\x02\x02-.\x07\x04\x02\x02./\x07\x05\x02\x02/0\x07\x06\x02\x02' +
-        '01\x05\b\x05\x021\x05\x03\x02\x02\x0223\x05\x12\n\x0234\x07-\x02\x024' +
-        '5\x07\x05\x02\x0256\x05\f\x07\x0267\x07\x06\x02\x0278\x05\b\x05\x028\x07' +
-        '\x03\x02\x02\x029:\x07\x07\x02\x02:;\x05\n\x06\x02;<\x07\b\x02\x02<\t' +
-        '\x03\x02\x02\x02=>\x05\x16\f\x02>?\x05\n\x06\x02?B\x03\x02\x02\x02@B\x03' +
-        '\x02\x02\x02A=\x03\x02\x02\x02A@\x03\x02\x02\x02B\v\x03\x02\x02\x02CF' +
-        '\x05\x0E\b\x02DF\x03\x02\x02\x02EC\x03\x02\x02\x02ED\x03\x02\x02\x02F' +
-        '\r\x03\x02\x02\x02GM\x05\x10\t\x02HI\x05\x10\t\x02IJ\x07\t\x02\x02JK\x05' +
-        '\x0E\b\x02KM\x03\x02\x02\x02LG\x03\x02\x02\x02LH\x03\x02\x02\x02M\x0F' +
-        '\x03\x02\x02\x02NO\x05\x12\n\x02OP\x07-\x02\x02P\x11\x03\x02\x02\x02Q' +
-        'X\x07\x03\x02\x02RX\x07\n\x02\x02SX\x07\v\x02\x02TX\x07\f\x02\x02UX\x07' +
-        '\r\x02\x02VX\x07\x0E\x02\x02WQ\x03\x02\x02\x02WR\x03\x02\x02\x02WS\x03' +
-        '\x02\x02\x02WT\x03\x02\x02\x02WU\x03\x02\x02\x02WV\x03\x02\x02\x02X\x13' +
-        '\x03\x02\x02\x02YZ\b\v\x01\x02Z|\x07*\x02\x02[|\x07+\x02\x02\\|\x07,\x02' +
-        '\x02]^\x07\x05\x02\x02^_\x05\x14\v\x02_`\x07\x06\x02\x02`|\x03\x02\x02' +
-        '\x02ab\x07\x0F\x02\x02b|\x05\x14\v\fcd\x07\x10\x02\x02d|\x05$\x13\x02' +
-        'ef\x05 \x11\x02fg\x05\x14\v\ng|\x03\x02\x02\x02h|\x07-\x02\x02ij\x07-' +
-        '\x02\x02jk\x07\x05\x02\x02kl\x05\x18\r\x02lm\x07\x06\x02\x02m|\x03\x02' +
-        '\x02\x02no\x07\x11\x02\x02op\x07\x05\x02\x02pq\x05\x14\v\x02qr\x07\x06' +
-        '\x02\x02r|\x03\x02\x02\x02st\x05$\x13\x02tu\x07\x12\x02\x02uv\x05\x14' +
-        '\v\x04v|\x03\x02\x02\x02wx\x05\x10\t\x02xy\x07\x12\x02\x02yz\x05\x14\v' +
-        '\x03z|\x03\x02\x02\x02{Y\x03\x02\x02\x02{[\x03\x02\x02\x02{\\\x03\x02' +
-        '\x02\x02{]\x03\x02\x02\x02{a\x03\x02\x02\x02{c\x03\x02\x02\x02{e\x03\x02' +
-        '\x02\x02{h\x03\x02\x02\x02{i\x03\x02\x02\x02{n\x03\x02\x02\x02{s\x03\x02' +
-        '\x02\x02{w\x03\x02\x02\x02|\x87\x03\x02\x02\x02}~\f\x06\x02\x02~\x7F\x05' +
-        '\x1C\x0F\x02\x7F\x80\x05\x14\v\x07\x80\x86\x03\x02\x02\x02\x81\x82\f\x05' +
-        '\x02\x02\x82\x83\x05\x1E\x10\x02\x83\x84\x05\x14\v\x06\x84\x86\x03\x02' +
-        '\x02\x02\x85}\x03\x02\x02\x02\x85\x81\x03\x02\x02\x02\x86\x89\x03\x02' +
-        '\x02\x02\x87\x85\x03\x02\x02\x02\x87\x88\x03\x02\x02\x02\x88\x15\x03\x02' +
-        '\x02\x02\x89\x87\x03\x02\x02\x02\x8A\x8B\x07\x13\x02\x02\x8B\x8C\x07\x05' +
-        '\x02\x02\x8C\x8D\x05"\x12\x02\x8D\x8E\x07\x06\x02\x02\x8E\x8F\x05\b\x05' +
-        '\x02\x8F\xB9\x03\x02\x02\x02\x90\x91\x07\x13\x02\x02\x91\x92\x07\x05\x02' +
-        '\x02\x92\x93\x05"\x12\x02\x93\x94\x07\x06\x02\x02\x94\x95\x05\b\x05\x02' +
-        '\x95\x96\x07\x14\x02\x02\x96\x97\x05\b\x05\x02\x97\xB9\x03\x02\x02\x02' +
-        '\x98\x99\x07\x15\x02\x02\x99\x9A\x07\x05\x02\x02\x9A\x9B\x05"\x12\x02' +
-        '\x9B\x9C\x07\x06\x02\x02\x9C\x9D\x05\b\x05\x02\x9D\xB9\x03\x02\x02\x02' +
-        '\x9E\x9F\x07\x16\x02\x02\x9F\xA0\x07\x05\x02\x02\xA0\xA1\x05\x14\v\x02' +
-        '\xA1\xA2\x07\x06\x02\x02\xA2\xA3\x07\x17\x02\x02\xA3\xB9\x03\x02\x02\x02' +
-        '\xA4\xA5\x05\x10\t\x02\xA5\xA6\x07\x17\x02\x02\xA6\xB9\x03\x02\x02\x02' +
-        '\xA7\xA8\x07\x18\x02\x02\xA8\xA9\x05\x14\v\x02\xA9\xAA\x07\x17\x02\x02' +
-        '\xAA\xB9\x03\x02\x02\x02\xAB\xAC\x07\x19\x02\x02\xAC\xAD\x07\x05\x02\x02' +
-        '\xAD\xAE\x05\x14\v\x02\xAE\xAF\x07\x06\x02\x02\xAF\xB0\x07\x17\x02\x02' +
-        '\xB0\xB9\x03\x02\x02\x02\xB1\xB2\x05\x14\v\x02\xB2\xB3\x07\x17\x02\x02' +
-        '\xB3\xB9\x03\x02\x02\x02\xB4\xB5\x07\x1A\x02\x02\xB5\xB9\x07\x17\x02\x02' +
-        '\xB6\xB7\x07\x1B\x02\x02\xB7\xB9\x07\x17\x02\x02\xB8\x8A\x03\x02\x02\x02' +
-        '\xB8\x90\x03\x02\x02\x02\xB8\x98\x03\x02\x02\x02\xB8\x9E\x03\x02\x02\x02' +
-        '\xB8\xA4\x03\x02\x02\x02\xB8\xA7\x03\x02\x02\x02\xB8\xAB\x03\x02\x02\x02' +
-        '\xB8\xB1\x03\x02\x02\x02\xB8\xB4\x03\x02\x02\x02\xB8\xB6\x03\x02\x02\x02' +
-        '\xB9\x17\x03\x02\x02\x02\xBA\xBD\x05\x1A\x0E\x02\xBB\xBD\x03\x02\x02\x02' +
-        '\xBC\xBA\x03\x02\x02\x02\xBC\xBB\x03\x02\x02\x02\xBD\x19\x03\x02\x02\x02' +
-        '\xBE\xC4\x05\x14\v\x02\xBF\xC0\x05\x14\v\x02\xC0\xC1\x07\t\x02\x02\xC1' +
-        '\xC2\x05\x1A\x0E\x02\xC2\xC4\x03\x02\x02\x02\xC3\xBE\x03\x02\x02\x02\xC3' +
-        '\xBF\x03\x02\x02\x02\xC4\x1B\x03\x02\x02\x02\xC5\xC6\t\x02\x02\x02\xC6' +
-        '\x1D\x03\x02\x02\x02\xC7\xC8\t\x03\x02\x02\xC8\x1F\x03\x02\x02\x02\xC9' +
-        '\xCA\x07(\x02\x02\xCA!\x03\x02\x02\x02\xCB\xCC\x05\x14\v\x02\xCC#\x03' +
-        '\x02\x02\x02\xCD\xD5\x07-\x02\x02\xCE\xCF\x07\x05\x02\x02\xCF\xD0\x05' +
-        '$\x13\x02\xD0\xD1\x07\x06\x02\x02\xD1\xD5\x03\x02\x02\x02\xD2\xD3\x07' +
-        '\x0F\x02\x02\xD3\xD5\x05\x14\v\x02\xD4\xCD\x03\x02\x02\x02\xD4\xCE\x03' +
-        '\x02\x02\x02\xD4\xD2\x03\x02\x02\x02\xD5%\x03\x02\x02\x02\x0E*AELW{\x85' +
-        '\x87\xB8\xBC\xC3\xD4'
+        '\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03' +
+        '\f\x03\f\x03\f\x05\f\xC3\n\f\x03\r\x03\r\x05\r\xC7\n\r\x03\x0E\x03\x0E' +
+        '\x03\x0E\x03\x0E\x03\x0E\x05\x0E\xCE\n\x0E\x03\x0F\x03\x0F\x03\x10\x03' +
+        '\x10\x03\x11\x03\x11\x03\x12\x03\x12\x03\x13\x03\x13\x03\x13\x03\x13\x03' +
+        '\x13\x03\x13\x03\x13\x05\x13\xDF\n\x13\x03\x13\x02\x02\x03\x14\x14\x02' +
+        '\x02\x04\x02\x06\x02\b\x02\n\x02\f\x02\x0E\x02\x10\x02\x12\x02\x14\x02' +
+        '\x16\x02\x18\x02\x1A\x02\x1C\x02\x1E\x02 \x02"\x02$\x02\x02\x04\x04\x02' +
+        "\x0F\x0F\x1D&\x03\x02'(\x02\xF2\x02*\x03\x02\x02\x02\x04,\x03\x02\x02" +
+        '\x02\x062\x03\x02\x02\x02\b9\x03\x02\x02\x02\nA\x03\x02\x02\x02\fE\x03' +
+        '\x02\x02\x02\x0EL\x03\x02\x02\x02\x10N\x03\x02\x02\x02\x12W\x03\x02\x02' +
+        '\x02\x14{\x03\x02\x02\x02\x16\xC2\x03\x02\x02\x02\x18\xC6\x03\x02\x02' +
+        '\x02\x1A\xCD\x03\x02\x02\x02\x1C\xCF\x03\x02\x02\x02\x1E\xD1\x03\x02\x02' +
+        '\x02 \xD3\x03\x02\x02\x02"\xD5\x03\x02\x02\x02$\xDE\x03\x02\x02\x02&' +
+        "'\x05\x06\x04\x02'(\x05\x02\x02\x02(+\x03\x02\x02\x02)+\x05\x04\x03" +
+        '\x02*&\x03\x02\x02\x02*)\x03\x02\x02\x02+\x03\x03\x02\x02\x02,-\x07\x03' +
+        '\x02\x02-.\x07\x04\x02\x02./\x07\x05\x02\x02/0\x07\x06\x02\x0201\x05\b' +
+        '\x05\x021\x05\x03\x02\x02\x0223\x05\x12\n\x0234\x07.\x02\x0245\x07\x05' +
+        '\x02\x0256\x05\f\x07\x0267\x07\x06\x02\x0278\x05\b\x05\x028\x07\x03\x02' +
+        '\x02\x029:\x07\x07\x02\x02:;\x05\n\x06\x02;<\x07\b\x02\x02<\t\x03\x02' +
+        '\x02\x02=>\x05\x16\f\x02>?\x05\n\x06\x02?B\x03\x02\x02\x02@B\x03\x02\x02' +
+        '\x02A=\x03\x02\x02\x02A@\x03\x02\x02\x02B\v\x03\x02\x02\x02CF\x05\x0E' +
+        '\b\x02DF\x03\x02\x02\x02EC\x03\x02\x02\x02ED\x03\x02\x02\x02F\r\x03\x02' +
+        '\x02\x02GM\x05\x10\t\x02HI\x05\x10\t\x02IJ\x07\t\x02\x02JK\x05\x0E\b\x02' +
+        'KM\x03\x02\x02\x02LG\x03\x02\x02\x02LH\x03\x02\x02\x02M\x0F\x03\x02\x02' +
+        '\x02NO\x05\x12\n\x02OP\x07.\x02\x02P\x11\x03\x02\x02\x02QX\x07\x03\x02' +
+        '\x02RX\x07\n\x02\x02SX\x07\v\x02\x02TX\x07\f\x02\x02UX\x07\r\x02\x02V' +
+        'X\x07\x0E\x02\x02WQ\x03\x02\x02\x02WR\x03\x02\x02\x02WS\x03\x02\x02\x02' +
+        'WT\x03\x02\x02\x02WU\x03\x02\x02\x02WV\x03\x02\x02\x02X\x13\x03\x02\x02' +
+        '\x02YZ\b\v\x01\x02Z|\x07+\x02\x02[|\x07,\x02\x02\\|\x07-\x02\x02]^\x07' +
+        '\x05\x02\x02^_\x05\x14\v\x02_`\x07\x06\x02\x02`|\x03\x02\x02\x02ab\x07' +
+        '\x0F\x02\x02b|\x05\x14\v\fcd\x07\x10\x02\x02d|\x05$\x13\x02ef\x05 \x11' +
+        '\x02fg\x05\x14\v\ng|\x03\x02\x02\x02h|\x07.\x02\x02ij\x07.\x02\x02jk\x07' +
+        '\x05\x02\x02kl\x05\x18\r\x02lm\x07\x06\x02\x02m|\x03\x02\x02\x02no\x07' +
+        '\x11\x02\x02op\x07\x05\x02\x02pq\x05\x14\v\x02qr\x07\x06\x02\x02r|\x03' +
+        '\x02\x02\x02st\x05$\x13\x02tu\x07\x12\x02\x02uv\x05\x14\v\x04v|\x03\x02' +
+        '\x02\x02wx\x05\x10\t\x02xy\x07\x12\x02\x02yz\x05\x14\v\x03z|\x03\x02\x02' +
+        '\x02{Y\x03\x02\x02\x02{[\x03\x02\x02\x02{\\\x03\x02\x02\x02{]\x03\x02' +
+        '\x02\x02{a\x03\x02\x02\x02{c\x03\x02\x02\x02{e\x03\x02\x02\x02{h\x03\x02' +
+        '\x02\x02{i\x03\x02\x02\x02{n\x03\x02\x02\x02{s\x03\x02\x02\x02{w\x03\x02' +
+        '\x02\x02|\x87\x03\x02\x02\x02}~\f\x06\x02\x02~\x7F\x05\x1C\x0F\x02\x7F' +
+        '\x80\x05\x14\v\x07\x80\x86\x03\x02\x02\x02\x81\x82\f\x05\x02\x02\x82\x83' +
+        '\x05\x1E\x10\x02\x83\x84\x05\x14\v\x06\x84\x86\x03\x02\x02\x02\x85}\x03' +
+        '\x02\x02\x02\x85\x81\x03\x02\x02\x02\x86\x89\x03\x02\x02\x02\x87\x85\x03' +
+        '\x02\x02\x02\x87\x88\x03\x02\x02\x02\x88\x15\x03\x02\x02\x02\x89\x87\x03' +
+        '\x02\x02\x02\x8A\x8B\x07\x13\x02\x02\x8B\x8C\x07\x05\x02\x02\x8C\x8D\x05' +
+        '"\x12\x02\x8D\x8E\x07\x06\x02\x02\x8E\x8F\x05\b\x05\x02\x8F\xC3\x03\x02' +
+        '\x02\x02\x90\x91\x07\x13\x02\x02\x91\x92\x07\x05\x02\x02\x92\x93\x05"' +
+        '\x12\x02\x93\x94\x07\x06\x02\x02\x94\x95\x05\b\x05\x02\x95\x96\x07\x14' +
+        '\x02\x02\x96\x97\x05\b\x05\x02\x97\xC3\x03\x02\x02\x02\x98\x99\x07\x15' +
+        '\x02\x02\x99\x9A\x07\x05\x02\x02\x9A\x9B\x05"\x12\x02\x9B\x9C\x07\x06' +
+        '\x02\x02\x9C\x9D\x05\b\x05\x02\x9D\xC3\x03\x02\x02\x02\x9E\x9F\x07\x16' +
+        '\x02\x02\x9F\xA0\x07\x05\x02\x02\xA0\xA1\x05\x14\v\x02\xA1\xA2\x07\x17' +
+        '\x02\x02\xA2\xA3\x05\x14\v\x02\xA3\xA4\x07\x17\x02\x02\xA4\xA5\x05\x14' +
+        '\v\x02\xA5\xA6\x07\x06\x02\x02\xA6\xA7\x05\b\x05\x02\xA7\xC3\x03\x02\x02' +
+        '\x02\xA8\xA9\x07\x18\x02\x02\xA9\xAA\x07\x05\x02\x02\xAA\xAB\x05\x14\v' +
+        '\x02\xAB\xAC\x07\x06\x02\x02\xAC\xAD\x07\x17\x02\x02\xAD\xC3\x03\x02\x02' +
+        '\x02\xAE\xAF\x05\x10\t\x02\xAF\xB0\x07\x17\x02\x02\xB0\xC3\x03\x02\x02' +
+        '\x02\xB1\xB2\x07\x19\x02\x02\xB2\xB3\x05\x14\v\x02\xB3\xB4\x07\x17\x02' +
+        '\x02\xB4\xC3\x03\x02\x02\x02\xB5\xB6\x07\x1A\x02\x02\xB6\xB7\x07\x05\x02' +
+        '\x02\xB7\xB8\x05\x14\v\x02\xB8\xB9\x07\x06\x02\x02\xB9\xBA\x07\x17\x02' +
+        '\x02\xBA\xC3\x03\x02\x02\x02\xBB\xBC\x05\x14\v\x02\xBC\xBD\x07\x17\x02' +
+        '\x02\xBD\xC3\x03\x02\x02\x02\xBE\xBF\x07\x1B\x02\x02\xBF\xC3\x07\x17\x02' +
+        '\x02\xC0\xC1\x07\x1C\x02\x02\xC1\xC3\x07\x17\x02\x02\xC2\x8A\x03\x02\x02' +
+        '\x02\xC2\x90\x03\x02\x02\x02\xC2\x98\x03\x02\x02\x02\xC2\x9E\x03\x02\x02' +
+        '\x02\xC2\xA8\x03\x02\x02\x02\xC2\xAE\x03\x02\x02\x02\xC2\xB1\x03\x02\x02' +
+        '\x02\xC2\xB5\x03\x02\x02\x02\xC2\xBB\x03\x02\x02\x02\xC2\xBE\x03\x02\x02' +
+        '\x02\xC2\xC0\x03\x02\x02\x02\xC3\x17\x03\x02\x02\x02\xC4\xC7\x05\x1A\x0E' +
+        '\x02\xC5\xC7\x03\x02\x02\x02\xC6\xC4\x03\x02\x02\x02\xC6\xC5\x03\x02\x02' +
+        '\x02\xC7\x19\x03\x02\x02\x02\xC8\xCE\x05\x14\v\x02\xC9\xCA\x05\x14\v\x02' +
+        '\xCA\xCB\x07\t\x02\x02\xCB\xCC\x05\x1A\x0E\x02\xCC\xCE\x03\x02\x02\x02' +
+        '\xCD\xC8\x03\x02\x02\x02\xCD\xC9\x03\x02\x02\x02\xCE\x1B\x03\x02\x02\x02' +
+        '\xCF\xD0\t\x02\x02\x02\xD0\x1D\x03\x02\x02\x02\xD1\xD2\t\x03\x02\x02\xD2' +
+        '\x1F\x03\x02\x02\x02\xD3\xD4\x07)\x02\x02\xD4!\x03\x02\x02\x02\xD5\xD6' +
+        '\x05\x14\v\x02\xD6#\x03\x02\x02\x02\xD7\xDF\x07.\x02\x02\xD8\xD9\x07\x05' +
+        '\x02\x02\xD9\xDA\x05$\x13\x02\xDA\xDB\x07\x06\x02\x02\xDB\xDF\x03\x02' +
+        '\x02\x02\xDC\xDD\x07\x0F\x02\x02\xDD\xDF\x05\x14\v\x02\xDE\xD7\x03\x02' +
+        '\x02\x02\xDE\xD8\x03\x02\x02\x02\xDE\xDC\x03\x02\x02\x02\xDF%\x03\x02' +
+        '\x02\x02\x0E*AELW{\x85\x87\xC2\xC6\xCD\xDE'
     public static __ATN: ATN
     public static get _ATN(): ATN {
         if (!wlp3Parser.__ATN) {
@@ -2641,6 +2675,48 @@ export class WhileStatementContext extends StatementContext {
     public accept<Result>(visitor: wlp3Visitor<Result>): Result {
         if (visitor.visitWhileStatement) {
             return visitor.visitWhileStatement(this)
+        } else {
+            return visitor.visitChildren(this)
+        }
+    }
+}
+export class ForStatementContext extends StatementContext {
+    public _first!: ExprContext
+    public _pred!: ExprContext
+    public _repeat!: ExprContext
+    public _body!: BlockContext
+    public expr(): ExprContext[]
+    public expr(i: number): ExprContext
+    public expr(i?: number): ExprContext | ExprContext[] {
+        if (i === undefined) {
+            return this.getRuleContexts(ExprContext)
+        } else {
+            return this.getRuleContext(i, ExprContext)
+        }
+    }
+    public block(): BlockContext {
+        return this.getRuleContext(0, BlockContext)
+    }
+    constructor(ctx: StatementContext) {
+        super(ctx.parent, ctx.invokingState)
+        this.copyFrom(ctx)
+    }
+    // @Override
+    public enterRule(listener: wlp3Listener): void {
+        if (listener.enterForStatement) {
+            listener.enterForStatement(this)
+        }
+    }
+    // @Override
+    public exitRule(listener: wlp3Listener): void {
+        if (listener.exitForStatement) {
+            listener.exitForStatement(this)
+        }
+    }
+    // @Override
+    public accept<Result>(visitor: wlp3Visitor<Result>): Result {
+        if (visitor.visitForStatement) {
+            return visitor.visitForStatement(this)
         } else {
             return visitor.visitChildren(this)
         }

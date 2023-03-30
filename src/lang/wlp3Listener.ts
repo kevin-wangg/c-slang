@@ -26,6 +26,7 @@ import { MultiArgsContext } from './wlp3Parser'
 import { IfStatementContext } from './wlp3Parser'
 import { IfElseStatementContext } from './wlp3Parser'
 import { WhileStatementContext } from './wlp3Parser'
+import { ForStatementContext } from './wlp3Parser'
 import { PrintfStatementContext } from './wlp3Parser'
 import { DclStatementContext } from './wlp3Parser'
 import { ReturnStatementContext } from './wlp3Parser'
@@ -382,6 +383,19 @@ export interface wlp3Listener extends ParseTreeListener {
      * @param ctx the parse tree
      */
     exitWhileStatement?: (ctx: WhileStatementContext) => void
+
+    /**
+     * Enter a parse tree produced by the `ForStatement`
+     * labeled alternative in `wlp3Parser.statement`.
+     * @param ctx the parse tree
+     */
+    enterForStatement?: (ctx: ForStatementContext) => void
+    /**
+     * Exit a parse tree produced by the `ForStatement`
+     * labeled alternative in `wlp3Parser.statement`.
+     * @param ctx the parse tree
+     */
+    exitForStatement?: (ctx: ForStatementContext) => void
 
     /**
      * Enter a parse tree produced by the `PrintfStatement`

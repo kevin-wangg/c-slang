@@ -36,6 +36,7 @@ import {
     ExprContext,
     ExprStatementContext,
     FnExprContext,
+    ForStatementContext,
     FreeStatementContext,
     FunctionContext,
     FunProgContext,
@@ -325,6 +326,30 @@ class ProgramGenerator implements wlp3Visitor<any> {
             type: 'WhileStatement',
             pred: this.visit(ctx._pred),
             body: this.visit(ctx._body)
+        }
+    }
+    visitForStatement(ctx: ForStatementContext): any {
+        return {
+            type: 'Block',
+            stmnts: {
+                type: 'StatementList',
+                first: {
+                    type: 'ExprStatement',
+                    val: this.visit(ctx._first)
+                },
+                rest: {
+                    type: 'StatementList',
+                    first: {
+                        type: 'ForStatement',
+                        pred: this.visit(ctx._pred),
+                        repeat: this.visit(ctx._repeat),
+                        body: this.visit(ctx._body)
+                    },
+                    rest: {
+                        type: 'StatementEmpty'
+                    }
+                }
+            }
         }
     }
     visitPrintfStatement(ctx: PrintfStatementContext): any {

@@ -103,7 +103,7 @@ const assign = (lval: string, val: any, env: Pair<any, any>): void => {
 
 const scanBlock = (stmts: any): Array<Pair<string, string>> => {
     const locals = []
-    while (stmts.type != 'StatementEmpty') {
+    while (stmts.type !== 'StatementEmpty') {
         const firstStatement = stmts.first
         if (firstStatement.type === 'DclStatement') {
             locals.push(pair(firstStatement.d.t.type, firstStatement.d.id.text))
@@ -325,6 +325,10 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
     WhileStatement: function* (node: any, context: Context) {
         push(A, {type: 'While_i', pred: node.pred, body: node.body}, node.pred)
+    },
+    
+    ForStatement: function* (node: any, context: Context) {
+        push(A, { type: 'For_i', pred: node.pred, repeat: node.repeat, body: node.body }, node.pred)
     },
 
     PrintfStatement: function* (node: any, context: Context) {
@@ -569,9 +573,9 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     Branch_i: function* (node: any, context: Context) {
-        if(S.pop()){
+        if (S.pop()) {
             push(A, node.cons)
-        } else if(node.alt){
+        } else if (node.alt) {
             push(A, node.alt)
         }
     },
@@ -583,6 +587,12 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     While_i: function* (node: any, context: Context) {
         if (S.pop()) {
             push(A, node, node.pred, node.body)
+        }
+    },
+
+    For_i: function* (node: any, context: Context) {
+        if(S.pop()) {
+            push(A, node, node.pred, { type: 'ExprStatement', val: node.repeat }, node.body)
         }
     },
 
@@ -640,8 +650,8 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
     Break_i: function* (node: any, context: Context) {
         let next = A.pop()
-        while(next.type != 'While_i'){
-            if(next.type == 'Environment_i'){
+        while(next.type !== 'While_i' && next.type !== 'For_i'){
+            if(next.type === 'Environment_i'){
                 E = next.env
             }
             next = A.pop()
@@ -650,8 +660,8 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
     Continue_i: function* (node: any, context: Context) {
         let next = A.pop()
-        while(next.type != 'While_i'){
-            if(next.type == 'Environment_i'){
+        while(next.type !== 'While_i' && next.type !== 'For_i'){
+            if(next.type === 'Environment_i'){
                 E = next.env
             }
             next = A.pop()
