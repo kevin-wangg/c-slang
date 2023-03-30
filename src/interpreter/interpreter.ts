@@ -412,7 +412,6 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     Function: function* (node: any, context: Context) {
-        assign(node.id.text, unassigned, E)
         const params = []
         if (node.prms.type === 'ParamsList') {
             let paramsList = node.prms.list
@@ -423,7 +422,6 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
             }
             params.push(pair(paramsList.first.t, paramsList.first.id.text))
         }
-        
         push(A, { 
             type: 'FunctionAssignment', 
             lv: node.id.text, 
@@ -433,7 +431,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
                 funcType: node.t.type, 
                 prms: params, 
                 blk: node.blk, 
-                env: E
+                env: JSON.parse(JSON.stringify(E))
             }})
     },
 
@@ -463,6 +461,9 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     GlobVarDcl: function* (node: any, context: Context) {
         const varName = node.glob.id.text
         const varType = node.glob.t.type
+        if (varName in E[0]) {
+            throw new Error("Global variable " + varName + " has already been declared")
+        }
         E[0][varName] = pair(varType, undeclared)
         push(A, node.prog, node.glob)
     },
@@ -470,6 +471,9 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     GlobVarDclAssignment: function* (node: any, context: Context) {
         const varName = node.glob.id.text
         const varType = node.glob.t.type
+        if (varName in E[0]) {
+            throw new Error("Global variable " + varName + " has already been declared")
+        }
         E[0][varName] = pair(varType, undeclared)
         console.log("PRINTING NODE")
         console.log(node)
