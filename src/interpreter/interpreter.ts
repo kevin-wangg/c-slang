@@ -118,8 +118,8 @@ const scanBlock = (stmts: any): Array<Pair<string, string>> => {
     return locals
 }
 
-const functions: Array<Pair<string, string>> = []
 const scanProg = (node: any): Array<Pair<string, string>> => {
+    const functions: Array<Pair<string, string>> = []
     while (node.type != 'MainProg') {
         const funcName = node.fun.id.text
         const funcType = node.fun.t.type + 'Function'
@@ -605,7 +605,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
             push(A, { type: 'Environment_i', env: E, sp: get_stack_pointer() }, { type: 'FnTypeCheck_i', funcName: func.funcName, funcType: func.funcType }, { type: 'Mark_i' })
         }
         push(A, func.blk)
-        
+        console.log('HERER: ', func) 
         if (func.prms.length != args.length) {
             throw new Error('Incorrect number of arguments provided to function ' + func.funcName)
         }
