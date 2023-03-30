@@ -659,6 +659,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     Continue_i: function* (node: any, context: Context) {
+        // TODO: fix continue for for loops
         let next = A.pop()
         while(next.type !== 'While_i' && next.type !== 'For_i'){
             if(next.type === 'Environment_i'){
