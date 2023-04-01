@@ -34,19 +34,20 @@ expr: INT # Int
 	| 'malloc' '(' first=expr ')' # MallocExpr
 	| first=expr binop=binaryoperator second=expr #BinopExpr
 	| first=expr binlog=binarylogical second=expr #BinlogExpr
+    | lv=lvalue '=' val=expr # Assignment
+    | d=dcl '=' val=expr # DclAssignment
     ;
-statement: lv=lvalue '=' val=expr ';' # Assignment
-       | 'if' '(' pred=predicate ')' cons=block # IfStatement
+statement: 'if' '(' pred=predicate ')' cons=block # IfStatement
          | 'if' '(' pred=predicate ')' cons=block 'else' alt=block # IfElseStatement
 	     | 'while' '(' pred=predicate ')' body=block # WhileStatement
+         | 'for' '(' first=expr ';' pred=expr ';' repeat=expr ')' body=block # ForStatement
 	     | 'printf' '(' body=expr ')' ';' # PrintfStatement
 	     | d=dcl ';' # DclStatement
-	     | d=dcl '=' val=expr ';' # DclAssignment
 	     | 'return' val=expr ';' # ReturnStatement
 	     | 'free' '(' val=expr ')' ';' # FreeStatement
        | val=expr ';'# ExprStatement
-       | 'break' ';' #BreakStatement
-       | 'continue' ';' #ContinueStatement
+       | 'break' ';' # BreakStatement
+       | 'continue' ';' # ContinueStatement
        ;
 args: list=arglist # ArgsList
     | <empty> # ArgsEmpty
