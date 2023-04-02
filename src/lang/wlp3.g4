@@ -1,7 +1,9 @@
 grammar wlp3;		
-program: fun=function prog=program # FunProg
-       | mn=main # MainProg
-       ;
+program: glob=dcl ';' prog=program # GlobVarDcl
+    | glob=dcl '=' val=expr ';' prog=program  # GlobVarDclAssignment
+    | fun=function prog=program # FunProg
+    | mn=main # MainProg
+    ;
 main:   'int' 'main' '(' ')' blk=block ;
 function : t=type id=ID '(' prms=params ')' blk=block ;
 block: '{' stmnts=statementlist '}' ;
