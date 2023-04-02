@@ -6,6 +6,8 @@ import { StatementListContext } from './wlp3Parser'
 import { StatementEmptyContext } from './wlp3Parser'
 import { SingleParamContext } from './wlp3Parser'
 import { MultiParamContext } from './wlp3Parser'
+import { GlobVarDclContext } from './wlp3Parser'
+import { GlobVarDclAssignmentContext } from './wlp3Parser'
 import { FunProgContext } from './wlp3Parser'
 import { MainProgContext } from './wlp3Parser'
 import { ParamsListContext } from './wlp3Parser'
@@ -106,6 +108,22 @@ export interface wlp3Visitor<Result> extends ParseTreeVisitor<Result> {
      * @return the visitor result
      */
     visitMultiParam?: (ctx: MultiParamContext) => Result
+
+    /**
+     * Visit a parse tree produced by the `GlobVarDcl`
+     * labeled alternative in `wlp3Parser.program`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitGlobVarDcl?: (ctx: GlobVarDclContext) => Result
+
+    /**
+     * Visit a parse tree produced by the `GlobVarDclAssignment`
+     * labeled alternative in `wlp3Parser.program`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitGlobVarDclAssignment?: (ctx: GlobVarDclAssignmentContext) => Result
 
     /**
      * Visit a parse tree produced by the `FunProg`

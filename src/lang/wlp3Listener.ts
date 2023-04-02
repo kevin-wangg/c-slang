@@ -6,6 +6,8 @@ import { StatementListContext } from './wlp3Parser'
 import { StatementEmptyContext } from './wlp3Parser'
 import { SingleParamContext } from './wlp3Parser'
 import { MultiParamContext } from './wlp3Parser'
+import { GlobVarDclContext } from './wlp3Parser'
+import { GlobVarDclAssignmentContext } from './wlp3Parser'
 import { FunProgContext } from './wlp3Parser'
 import { MainProgContext } from './wlp3Parser'
 import { ParamsListContext } from './wlp3Parser'
@@ -123,6 +125,32 @@ export interface wlp3Listener extends ParseTreeListener {
      * @param ctx the parse tree
      */
     exitMultiParam?: (ctx: MultiParamContext) => void
+
+    /**
+     * Enter a parse tree produced by the `GlobVarDcl`
+     * labeled alternative in `wlp3Parser.program`.
+     * @param ctx the parse tree
+     */
+    enterGlobVarDcl?: (ctx: GlobVarDclContext) => void
+    /**
+     * Exit a parse tree produced by the `GlobVarDcl`
+     * labeled alternative in `wlp3Parser.program`.
+     * @param ctx the parse tree
+     */
+    exitGlobVarDcl?: (ctx: GlobVarDclContext) => void
+
+    /**
+     * Enter a parse tree produced by the `GlobVarDclAssignment`
+     * labeled alternative in `wlp3Parser.program`.
+     * @param ctx the parse tree
+     */
+    enterGlobVarDclAssignment?: (ctx: GlobVarDclAssignmentContext) => void
+    /**
+     * Exit a parse tree produced by the `GlobVarDclAssignment`
+     * labeled alternative in `wlp3Parser.program`.
+     * @param ctx the parse tree
+     */
+    exitGlobVarDclAssignment?: (ctx: GlobVarDclAssignmentContext) => void
 
     /**
      * Enter a parse tree produced by the `FunProg`

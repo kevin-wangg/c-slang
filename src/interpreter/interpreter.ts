@@ -118,17 +118,6 @@ const scanBlock = (stmts: any): Array<Pair<string, string>> => {
     return locals
 }
 
-const scanProg = (node: any): Array<Pair<string, string>> => {
-    const functions: Array<Pair<string, string>> = []
-    while (node.type != 'MainProg') {
-        const funcName = node.fun.id.text
-        const funcType = node.fun.t.type + 'Function'
-        functions.push(pair(funcType, funcName))
-        node = node.prog
-    }
-    return functions
-}
-
 const lookup = (lval: string, env: Pair<any, any>): any => {
     if (env == null) {
         throw new Error('Unbound name: ' + lval)
@@ -228,11 +217,10 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     FunProg: function* (node: any, context: Context) {
-      const functionDefinitions: Array<Pair<string,string>> = scanProg(node)
-      for (let i = 0; i < functionDefinitions.length; i++) {
-          E[0][functionDefinitions[i][1]] = pair(functionDefinitions[i][0], undeclared)
-      }
-      push(A, node.prog, node.fun)
+        const funcName = node.fun.id.text
+        const funcType = node.fun.t.type + 'Function'
+        E[0][funcName] = pair(funcType, undeclared)
+        push(A, node.prog, node.fun)
     },
 
     Lambda: function* (node: any, context: Context) {
@@ -406,7 +394,6 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     FnExpr: function* (node: any, context: Context) {
-        // TODO: Implement parameter handling
         let numArgs = 0
         if (node.arglst.type !== 'ArgsEmpty') {
             let args = node.arglst.list
@@ -434,7 +421,6 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     Function: function* (node: any, context: Context) {
-        assign(node.id.text, unassigned, E)
         const params = []
         if (node.prms.type === 'ParamsList') {
             let paramsList = node.prms.list
@@ -455,7 +441,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
                 funcType: node.t.type, 
                 prms: params, 
                 blk: node.blk, 
-                env: E
+                env: JSON.parse(JSON.stringify(E))
             }})
     },
 
@@ -480,6 +466,29 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
     Predicate: function* (node: any, context: Context) {
         push(A, node.pred)
+    },
+
+    GlobVarDcl: function* (node: any, context: Context) {
+        const varName = node.glob.id.text
+        const varType = node.glob.t.type
+        if (varName in E[0]) {
+            throw new Error("Global variable " + varName + " has already been declared")
+        }
+        E[0][varName] = pair(varType, undeclared)
+        push(A, node.prog, node.glob)
+    },
+
+    GlobVarDclAssignment: function* (node: any, context: Context) {
+        const varName = node.glob.id.text
+        const varType = node.glob.t.type
+        if (varName in E[0]) {
+            throw new Error("Global variable " + varName + " has already been declared")
+        }
+        E[0][varName] = pair(varType, undeclared)
+        if (node.val.type != 'IntLiteral' && node.val.type != 'BoolLiteral' && node.val.type != 'CharLiteral') {
+            throw new Error("Global variable declaration must be of type Int, Bool, or Char")
+        }
+        push(A, node.prog, {type: "Pop_i"} , { type: 'Assignment', lv: { type: 'IdLvalue', id: node.glob.id}, val: node.val}, node.glob)
     },
 
     // Instructions
@@ -672,13 +681,14 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 }
 // tslint:enable:object-literal-shorthand
 
-// An environment is null or a pair whose head is a frame
-// and whose tail is an environment.
-const global_frame = {}
-const global_environment = null
 const step_limit = 100000
 
 export function* evaluate(node: es.Node, context: Context) {
+    // An environment is null or a pair whose head is a frame
+    // and whose tail is an environment.
+    const global_frame = {}
+    const global_environment = null
+
     A = []
     A.push(node)
     S = []
