@@ -631,9 +631,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
     FnTypeCheck_i: function* (node: any, context: Context) {
         const retVal = peek(S)
-        if ((node.funcType == 'StringType' && !isString(retVal)) ||
-            (node.funcType == 'BoolType' && !isBoolean(retVal)) ||
-            (node.funcType == 'IntType' && !isInteger(retVal))) {
+        if (!isTypeMatch(retVal, node.funcType)) {
             throw new Error('Type mismatch: Function ' + node.funcName + ' should return type ' + node.funcType)
         }
     },
