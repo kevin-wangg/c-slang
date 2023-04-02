@@ -38,13 +38,13 @@ export const isBoolFunc = (val: any): boolean => {
     )
 }
 
-export const isStringFunc = (val: any): boolean => {
+export const isCharFunc = (val: any): boolean => {
     return (
         val !== null &&
         typeof val === 'object' &&
         val.hasOwnProperty('type') &&
         val.type === 'Closure' &&
-        val.funcType === 'StringType'
+        val.funcType === 'CharType'
     )
 }
 
@@ -55,7 +55,7 @@ export const isTypeMatch = (val: any, type: string): boolean => {
         (type === 'CharType' && isString(val) && val.length === 1) ||
         (type == 'BoolType' && isBoolean(val)) ||
         (type == 'IntType' && isInteger(val)) ||
-        (type == 'StringTypeFunction' && isStringFunc(val)) ||
+        (type == 'CharTypeFunction' && isCharFunc(val)) ||
         (type == 'BoolTypeFunction' && isBoolFunc(val)) ||
         (type == 'IntTypeFunction' && isIntFunc(val)) ||
         (type === 'IntStarType' &&
