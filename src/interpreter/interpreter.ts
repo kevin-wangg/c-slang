@@ -684,11 +684,10 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 const step_limit = 100000
 
 export function* evaluate(node: es.Node, context: Context) {
-    
     // An environment is null or a pair whose head is a frame
     // and whose tail is an environment.
-    let global_frame = {}
-    let global_environment = null;
+    const global_frame = {}
+    const global_environment = null
 
     A = []
     A.push(node)
