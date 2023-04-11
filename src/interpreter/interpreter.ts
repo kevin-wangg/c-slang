@@ -634,9 +634,9 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
             addresses[i] = stack_allocate(func.prms[i][0].type, type_sizes[func.prms[i][0].type])
             heap_assign(func.prms[i][0].type, args[i], addresses[i])
         }
-        let lvals = [...func.prms]
+        const lvals = [...func.prms]
         lvals.push([{type: func.funcType }, func.funcName])
-        let vals = [...addresses]
+        const vals = [...addresses]
         vals.push(func)
         E = extendEnvironment(lvals, vals, func.env)
     },
