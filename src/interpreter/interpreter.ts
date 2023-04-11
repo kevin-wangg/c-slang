@@ -675,6 +675,9 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
             next = A.pop()
         }
         push(A, next, next.pred)
+        if (next.type === 'For_i') {
+            push(A, { type: 'ExprStatement', val: next.repeat })
+        }
     },
 }
 // tslint:enable:object-literal-shorthand
