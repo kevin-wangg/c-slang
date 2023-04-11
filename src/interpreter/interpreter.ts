@@ -332,7 +332,6 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     ReturnStatement: function* (node: any, context: Context) {
-        // TODO: Implement properly with functions
         push(A, { type: 'Reset_i'}, node.val)
     },
 
@@ -635,7 +634,11 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
             addresses[i] = stack_allocate(func.prms[i][0].type, type_sizes[func.prms[i][0].type])
             heap_assign(func.prms[i][0].type, args[i], addresses[i])
         }
-        E = extendEnvironment(func.prms, addresses, func.env)
+        const lvals = [...func.prms]
+        lvals.push([{type: func.funcType }, func.funcName])
+        const vals = [...addresses]
+        vals.push(func)
+        E = extendEnvironment(lvals, vals, func.env)
     },
 
     FnTypeCheck_i: function* (node: any, context: Context) {
