@@ -582,7 +582,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
             handleRuntimeError(context, error)
         }
         // console.log(leftValue, rightValue)
-        let result = evaluateBinaryExpression(node.sym.children[0].text, leftValue, rightValue)
+        const result = evaluateBinaryExpression(node.sym.children[0].text, leftValue, rightValue)
         // console.log('RESULT', result)
         if(pointer) {
             push(S, { is_pointer: true, addr: result })
