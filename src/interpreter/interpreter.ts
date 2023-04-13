@@ -119,7 +119,7 @@ const scanBlock = (stmts: any): Array<Pair<string, string>> => {
 }
 
 const is_wrapped_addr = (obj: any): boolean => {
-    if(typeof obj === 'object' && obj.hasOwnProperty('is_pointer') && obj.is_pointer === true) {
+    if (typeof obj === 'object' && obj.hasOwnProperty('is_pointer') && obj.is_pointer === true) {
         return true
     }
     return false
@@ -395,7 +395,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
         if(isUndeclared(addr)) {
             throw new Error(`Lookup of undeclared variable ${node.id.text}`)
         }
-        let val = heap_lookup(addr)
+        const val = heap_lookup(addr)
         if(type === 'IntStarType' || type === 'CharStarType' || type === 'BoolStarType') {
             const wrapped_addr = { is_pointer: true, addr: val } 
             push(S, wrapped_addr)
