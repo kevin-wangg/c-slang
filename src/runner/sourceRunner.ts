@@ -40,9 +40,7 @@ export async function sourceRunner(
     context.errors = []
 
     // Parse and validate
-    console.log('PARSING')
     const program: es.Program | undefined = parse(code, context)
-    console.log('FINISHED PARSING')
     if (!program) {
         return resolvedErrorPromise
     }
