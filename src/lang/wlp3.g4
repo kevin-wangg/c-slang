@@ -85,3 +85,7 @@ BOOL    : 'true' | 'false';
 CHAR    : '\''.'\'';
 ID: [a-zA-Z_][a-zA-Z_0-9]* ;
 
+LineComment
+    :   '//' ~[\r\n]*
+        -> skip
+    ;
