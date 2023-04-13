@@ -24,13 +24,7 @@ type: 'int' # IntType
     | 'bool*' # BoolStarType
     | 'char*' # CharStarType
     ;
-expr: INT # Int
-    | BOOL # Bool
-    | CHAR # Char
-    | '(' inner=expr ')' # Parentheses
-    | '*' first=expr # StarExpr
-	| '&' first=lvalue # AmpersandExpr
-	| unop=unaryoperator first=expr # UnopExpr
+expr: unop=unaryoperator first=expr # UnopExpr
 	| id=ID # IdExpr
 	| id=ID '(' arglst=args ')' # FnExpr
 	| 'malloc' '(' first=expr ')' # MallocExpr
@@ -38,6 +32,12 @@ expr: INT # Int
 	| first=expr binlog=binarylogical second=expr #BinlogExpr
     | lv=lvalue '=' val=expr # Assignment
     | d=dcl '=' val=expr # DclAssignment
+    | INT # Int
+    | BOOL # Bool
+    | CHAR # Char
+    | '(' inner=expr ')' # Parentheses
+    | '*' first=expr # StarExpr
+	| '&' first=lvalue # AmpersandExpr
     ;
 statement: 'if' '(' pred=predicate ')' cons=block # IfStatement
          | 'if' '(' pred=predicate ')' cons=block 'else' alt=block # IfElseStatement

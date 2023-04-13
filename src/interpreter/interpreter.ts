@@ -510,6 +510,13 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
         push(S, { is_pointer: true, addr: addr })
     },
 
+    Deref_i: function* (node: any, context: Context) {
+        const lvalue = S.pop()
+        const [_, addr] = lookup(lvalue, E)
+
+        push(S, { is_pointer: true, addr: addr })
+    },
+
     Free_i: function* (node: any, context: Context) {
         let addr = S.pop()
         if(is_wrapped_addr(addr)) {
@@ -549,19 +556,23 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     BinopExpr_i: function* (node: any, context: Context) {
         let leftValue = S.pop()
         let rightValue = S.pop()
+        let pointer = false
         if(is_wrapped_addr(leftValue)) {
             leftValue = leftValue.addr
             if(is_wrapped_addr(rightValue)) {
                 throw new Error('Cannot add two pointer')
             } else if(isNumber(rightValue)) {
-                rightValue *= HEAP_TYPE[leftValue] // adjust for type size
+                // console.log(HEAP_TYPE[leftValue])
+                rightValue *= type_sizes[REVERSE_TYPES[HEAP_TYPE[leftValue]]] // adjust for type size
+                pointer = true
             } else {
                 throw new Error('Cannot add non-number to pointer')
             }
         } else if(is_wrapped_addr(rightValue)) {
             rightValue = rightValue.addr
             if(isNumber(leftValue)) {
-                leftValue *= HEAP_TYPE[rightValue]
+                leftValue *= type_sizes[REVERSE_TYPES[HEAP_TYPE[rightValue]]]
+                pointer = true
             } else {
                 throw new Error('Cannot add non-number to pointer')
             }
@@ -570,7 +581,15 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
         if (error) {
             handleRuntimeError(context, error)
         }
-        push(S, evaluateBinaryExpression(node.sym.children[0].text, leftValue, rightValue))
+        // console.log(leftValue, rightValue)
+        let result = evaluateBinaryExpression(node.sym.children[0].text, leftValue, rightValue)
+        // console.log('RESULT', result)
+        if(pointer) {
+            push(S, { is_pointer: true, addr: result })
+        }
+        else {
+            push(S, result)
+        }
     },
 
     BinlogExpr_i: function* (node: any, context: Context) {
@@ -590,9 +609,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
         if(is_wrapped_addr(new_val)) {
             new_val = new_val.addr
         }
-        console.log('HRERER', lvalue) 
         if(is_wrapped_addr(lvalue)) {
-            console.log('WWOWO')
             lvalue = lvalue.addr
             // Lvalue is address (dereference address)
             const type = REVERSE_TYPES[HEAP_TYPE[lvalue]]

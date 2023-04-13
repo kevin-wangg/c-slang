@@ -10,7 +10,8 @@ export const type_sizes = {
     IntType: 4,
     IntStarType: 4,
     BoolStarType: 4,
-    CharStarType: 4
+    CharStarType: 4,
+    AnyType: 4
 }
 
 export const TYPES = {
