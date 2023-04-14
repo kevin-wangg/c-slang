@@ -557,33 +557,39 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
         let leftValue = S.pop()
         let rightValue = S.pop()
         let pointer = false
-        if(is_wrapped_addr(leftValue)) {
-            leftValue = leftValue.addr
-            if(is_wrapped_addr(rightValue)) {
-                throw new Error('Cannot add two pointer')
-            } else if(isNumber(rightValue)) {
-                // console.log(HEAP_TYPE[leftValue])
-                rightValue *= type_sizes[REVERSE_TYPES[HEAP_TYPE[leftValue]]] // adjust for type size
-                pointer = true
-            } else {
-                throw new Error('Cannot add non-number to pointer')
+        if(node.sym.children[0].text == '+') {
+            if(is_wrapped_addr(leftValue)) {
+                leftValue = leftValue.addr
+                if(is_wrapped_addr(rightValue)) {
+                    throw new Error('Cannot add two pointer')
+                } else if(isNumber(rightValue)) {
+                    rightValue *= type_sizes[REVERSE_TYPES[HEAP_TYPE[leftValue]]] // adjust for type size
+                    pointer = true
+                } else {
+                    throw new Error('Cannot add non-number to pointer')
+                }
+            } else if(is_wrapped_addr(rightValue)) {
+                rightValue = rightValue.addr
+                if(isNumber(leftValue)) {
+                    leftValue *= type_sizes[REVERSE_TYPES[HEAP_TYPE[rightValue]]]
+                    pointer = true
+                } else {
+                    throw new Error('Cannot add non-number to pointer')
+                }
             }
-        } else if(is_wrapped_addr(rightValue)) {
-            rightValue = rightValue.addr
-            if(isNumber(leftValue)) {
-                leftValue *= type_sizes[REVERSE_TYPES[HEAP_TYPE[rightValue]]]
-                pointer = true
-            } else {
-                throw new Error('Cannot add non-number to pointer')
+        } else {
+            if(is_wrapped_addr(leftValue)) {
+                leftValue = leftValue.addr
+            }
+            if(is_wrapped_addr(rightValue)) {
+                rightValue = rightValue.addr
             }
         }
         const error = rttc.checkBinaryExpression(node, node.sym, leftValue, rightValue)
         if (error) {
             handleRuntimeError(context, error)
         }
-        // console.log(leftValue, rightValue)
         const result = evaluateBinaryExpression(node.sym.children[0].text, leftValue, rightValue)
-        // console.log('RESULT', result)
         if(pointer) {
             push(S, { is_pointer: true, addr: result })
         }
