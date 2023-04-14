@@ -118,6 +118,13 @@ const scanBlock = (stmts: any): Array<Pair<string, string>> => {
     return locals
 }
 
+const is_wrapped_addr = (obj: any): boolean => {
+    if (typeof obj === 'object' && obj.hasOwnProperty('is_pointer') && obj.is_pointer === true) {
+        return true
+    }
+    return false
+}
+
 const lookup = (lval: string, env: Pair<any, any>): any => {
     if (env == null) {
         throw new Error('Unbound name: ' + lval)
@@ -384,12 +391,17 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     IdExpr: function* (node: any, context: Context) {
-        const [_, addr] = lookup(node.id.text, E)
+        const [type, addr] = lookup(node.id.text, E)
         if(isUndeclared(addr)) {
             throw new Error(`Lookup of undeclared variable ${node.id.text}`)
         }
         const val = heap_lookup(addr)
-        push(S, val)
+        if(type === 'IntStarType' || type === 'CharStarType' || type === 'BoolStarType') {
+            const wrapped_addr = { is_pointer: true, addr: val } 
+            push(S, wrapped_addr)
+        } else {
+            push(S, val)
+        }
     },
 
     FnExpr: function* (node: any, context: Context) {
@@ -494,16 +506,30 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     MallocExpr_i: function* (node: any, context: Context) {
         const bytes_to_allocate = S.pop()
         const addr = heap_allocate('AnyType', bytes_to_allocate)
-        push(S, addr)
+        
+        push(S, { is_pointer: true, addr: addr })
+    },
+
+    Deref_i: function* (node: any, context: Context) {
+        const lvalue = S.pop()
+        const [_, addr] = lookup(lvalue, E)
+
+        push(S, { is_pointer: true, addr: addr })
     },
 
     Free_i: function* (node: any, context: Context) {
-        const addr = S.pop()
+        let addr = S.pop()
+        if(is_wrapped_addr(addr)) {
+            addr = addr.addr
+        }
         heap_deallocate(addr)
     },
 
     StarExpr_i: function* (node: any, context: Context) {
-        const addr = S.pop()
+        let addr = S.pop()
+        if(is_wrapped_addr(addr)) {
+            addr = addr.addr
+        }
         if(!isNumber(addr)) {
             throw new Error(`Can't dereference a non address value: ${addr}`)
         }
@@ -514,7 +540,8 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     AmperSandExpr_i: function* (node: any, context: Context) {
         const lvalue = S.pop()
         const [_, addr] = lookup(lvalue, E)
-        push(S, addr)
+        const wrapped_addr = { is_pointer: true, addr: addr }
+        push(S, wrapped_addr)
     },
 
     UnopExpr_i: function* (node: any, context: Context) {
@@ -527,13 +554,48 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     BinopExpr_i: function* (node: any, context: Context) {
-        const leftValue = S.pop()
-        const rightValue = S.pop()
+        let leftValue = S.pop()
+        let rightValue = S.pop()
+        let pointer = false
+        if(node.sym.children[0].text == '+') {
+            if(is_wrapped_addr(leftValue)) {
+                leftValue = leftValue.addr
+                if(is_wrapped_addr(rightValue)) {
+                    throw new Error('Cannot add two pointer')
+                } else if(isNumber(rightValue)) {
+                    rightValue *= type_sizes[REVERSE_TYPES[HEAP_TYPE[leftValue]]] // adjust for type size
+                    pointer = true
+                } else {
+                    throw new Error('Cannot add non-number to pointer')
+                }
+            } else if(is_wrapped_addr(rightValue)) {
+                rightValue = rightValue.addr
+                if(isNumber(leftValue)) {
+                    leftValue *= type_sizes[REVERSE_TYPES[HEAP_TYPE[rightValue]]]
+                    pointer = true
+                } else {
+                    throw new Error('Cannot add non-number to pointer')
+                }
+            }
+        } else {
+            if(is_wrapped_addr(leftValue)) {
+                leftValue = leftValue.addr
+            }
+            if(is_wrapped_addr(rightValue)) {
+                rightValue = rightValue.addr
+            }
+        }
         const error = rttc.checkBinaryExpression(node, node.sym, leftValue, rightValue)
         if (error) {
             handleRuntimeError(context, error)
         }
-        push(S, evaluateBinaryExpression(node.sym.children[0].text, leftValue, rightValue))
+        const result = evaluateBinaryExpression(node.sym.children[0].text, leftValue, rightValue)
+        if(pointer) {
+            push(S, { is_pointer: true, addr: result })
+        }
+        else {
+            push(S, result)
+        }
     },
 
     BinlogExpr_i: function* (node: any, context: Context) {
@@ -548,9 +610,13 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     Assignment_i: function* (node: any, context: Context) {
-        const lvalue = S.pop()
-        const new_val = peek(S)
-        if(isNumber(lvalue)) {
+        let lvalue = S.pop()
+        let new_val = peek(S)
+        if(is_wrapped_addr(new_val)) {
+            new_val = new_val.addr
+        }
+        if(is_wrapped_addr(lvalue)) {
+            lvalue = lvalue.addr
             // Lvalue is address (dereference address)
             const type = REVERSE_TYPES[HEAP_TYPE[lvalue]]
             heap_assign(type, new_val, lvalue)

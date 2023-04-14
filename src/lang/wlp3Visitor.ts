@@ -36,12 +36,6 @@ import { FreeStatementContext } from './wlp3Parser'
 import { ExprStatementContext } from './wlp3Parser'
 import { BreakStatementContext } from './wlp3Parser'
 import { ContinueStatementContext } from './wlp3Parser'
-import { IntContext } from './wlp3Parser'
-import { BoolContext } from './wlp3Parser'
-import { CharContext } from './wlp3Parser'
-import { ParenthesesContext } from './wlp3Parser'
-import { StarExprContext } from './wlp3Parser'
-import { AmpersandExprContext } from './wlp3Parser'
 import { UnopExprContext } from './wlp3Parser'
 import { IdExprContext } from './wlp3Parser'
 import { FnExprContext } from './wlp3Parser'
@@ -50,6 +44,12 @@ import { BinopExprContext } from './wlp3Parser'
 import { BinlogExprContext } from './wlp3Parser'
 import { AssignmentContext } from './wlp3Parser'
 import { DclAssignmentContext } from './wlp3Parser'
+import { IntContext } from './wlp3Parser'
+import { BoolContext } from './wlp3Parser'
+import { CharContext } from './wlp3Parser'
+import { ParenthesesContext } from './wlp3Parser'
+import { StarExprContext } from './wlp3Parser'
+import { AmpersandExprContext } from './wlp3Parser'
 import { ProgramContext } from './wlp3Parser'
 import { MainContext } from './wlp3Parser'
 import { FunctionContext } from './wlp3Parser'
@@ -350,54 +350,6 @@ export interface wlp3Visitor<Result> extends ParseTreeVisitor<Result> {
     visitContinueStatement?: (ctx: ContinueStatementContext) => Result
 
     /**
-     * Visit a parse tree produced by the `Int`
-     * labeled alternative in `wlp3Parser.expr`.
-     * @param ctx the parse tree
-     * @return the visitor result
-     */
-    visitInt?: (ctx: IntContext) => Result
-
-    /**
-     * Visit a parse tree produced by the `Bool`
-     * labeled alternative in `wlp3Parser.expr`.
-     * @param ctx the parse tree
-     * @return the visitor result
-     */
-    visitBool?: (ctx: BoolContext) => Result
-
-    /**
-     * Visit a parse tree produced by the `Char`
-     * labeled alternative in `wlp3Parser.expr`.
-     * @param ctx the parse tree
-     * @return the visitor result
-     */
-    visitChar?: (ctx: CharContext) => Result
-
-    /**
-     * Visit a parse tree produced by the `Parentheses`
-     * labeled alternative in `wlp3Parser.expr`.
-     * @param ctx the parse tree
-     * @return the visitor result
-     */
-    visitParentheses?: (ctx: ParenthesesContext) => Result
-
-    /**
-     * Visit a parse tree produced by the `StarExpr`
-     * labeled alternative in `wlp3Parser.expr`.
-     * @param ctx the parse tree
-     * @return the visitor result
-     */
-    visitStarExpr?: (ctx: StarExprContext) => Result
-
-    /**
-     * Visit a parse tree produced by the `AmpersandExpr`
-     * labeled alternative in `wlp3Parser.expr`.
-     * @param ctx the parse tree
-     * @return the visitor result
-     */
-    visitAmpersandExpr?: (ctx: AmpersandExprContext) => Result
-
-    /**
      * Visit a parse tree produced by the `UnopExpr`
      * labeled alternative in `wlp3Parser.expr`.
      * @param ctx the parse tree
@@ -460,6 +412,54 @@ export interface wlp3Visitor<Result> extends ParseTreeVisitor<Result> {
      * @return the visitor result
      */
     visitDclAssignment?: (ctx: DclAssignmentContext) => Result
+
+    /**
+     * Visit a parse tree produced by the `Int`
+     * labeled alternative in `wlp3Parser.expr`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitInt?: (ctx: IntContext) => Result
+
+    /**
+     * Visit a parse tree produced by the `Bool`
+     * labeled alternative in `wlp3Parser.expr`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitBool?: (ctx: BoolContext) => Result
+
+    /**
+     * Visit a parse tree produced by the `Char`
+     * labeled alternative in `wlp3Parser.expr`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitChar?: (ctx: CharContext) => Result
+
+    /**
+     * Visit a parse tree produced by the `Parentheses`
+     * labeled alternative in `wlp3Parser.expr`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitParentheses?: (ctx: ParenthesesContext) => Result
+
+    /**
+     * Visit a parse tree produced by the `StarExpr`
+     * labeled alternative in `wlp3Parser.expr`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitStarExpr?: (ctx: StarExprContext) => Result
+
+    /**
+     * Visit a parse tree produced by the `AmpersandExpr`
+     * labeled alternative in `wlp3Parser.expr`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitAmpersandExpr?: (ctx: AmpersandExprContext) => Result
 
     /**
      * Visit a parse tree produced by `wlp3Parser.program`.
