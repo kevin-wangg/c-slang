@@ -38,6 +38,8 @@ expr: INT # Int
 	| first=expr binlog=binarylogical second=expr #BinlogExpr
     | lv=lvalue '=' val=expr # Assignment
     | d=dcl '=' val=expr # DclAssignment
+    | t=type id=ID '['']' '=' '{' val=arrinit '}' #DclArrAssignment
+    | id=ID '[' index=expr ']' #ArrIndex
     ;
 statement: 'if' '(' pred=predicate ')' cons=block # IfStatement
          | 'if' '(' pred=predicate ')' cons=block 'else' alt=block # IfElseStatement
@@ -56,6 +58,12 @@ args: list=arglist # ArgsList
     ;
 arglist: first=expr # SingleArg
     | first=expr ',' rest=arglist # MultiArgs
+    ;
+arrinit: list=arrinitelems # ArrInitElems
+    | <empty> # ArrInitEmpty
+    ;
+arrinitelems: first=expr # SingleArrElem
+    | first=expr ',' rest=arrinitelems # MultiArrElems
     ;
 binaryoperator: '+'
                | '-'

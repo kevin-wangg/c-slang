@@ -14,6 +14,9 @@ import {
     ArgsContext,
     ArgsEmptyContext,
     ArgsListContext,
+    ArrIndexContext,
+    ArrInitElemsContext,
+    ArrInitEmptyContext,
     AssignmentContext,
     BinarylogicalContext,
     BinaryoperatorContext,
@@ -29,6 +32,7 @@ import {
     CharStarTypeContext,
     CharTypeContext,
     ContinueStatementContext,
+    DclArrAssignmentContext,
     DclAssignmentContext,
     DclContext,
     DclStatementContext,
@@ -54,6 +58,7 @@ import {
     MainProgContext,
     MallocExprContext,
     MultiArgsContext,
+    MultiArrElemsContext,
     MultiParamContext,
     ParamlistContext,
     ParamsContext,
@@ -65,6 +70,7 @@ import {
     ProgramContext,
     ReturnStatementContext,
     SingleArgContext,
+    SingleArrElemContext,
     SingleParamContext,
     StarExprContext,
     StatementContext,
@@ -274,6 +280,17 @@ class ProgramGenerator implements wlp3Visitor<any> {
             type: 'CharStarType'
         }
     }
+    visitArrInitElems(ctx: ArrInitElemsContext): any {
+        return {
+            type: 'ArrInitElems',
+            list: this.visit(ctx._list)
+        }
+    }
+    visitArrInitEmpty(ctx: ArrInitEmptyContext): any {
+        return {
+            type: 'ArrInitEmpty'
+        }
+    }
     visitArgsList(ctx: ArgsListContext): any {
         return {
             type: 'ArgsList',
@@ -306,6 +323,19 @@ class ProgramGenerator implements wlp3Visitor<any> {
     visitMultiArgs(ctx: MultiArgsContext): any {
         return {
             type: 'MultiArgs',
+            first: this.visit(ctx._first),
+            rest: this.visit(ctx._rest)
+        }
+    }
+    visitSingleArrElem(ctx: SingleArrElemContext): any {
+        return {
+            type: 'SingleArrElem',
+            first: this.visit(ctx._first)
+        }
+    }
+    visitMultiArrElems(ctx: MultiArrElemsContext): any {
+        return {
+            type: 'MultiArrElems',
             first: this.visit(ctx._first),
             rest: this.visit(ctx._rest)
         }
@@ -386,6 +416,21 @@ class ProgramGenerator implements wlp3Visitor<any> {
             type: 'DclAssignment',
             d: this.visit(ctx._d),
             val: this.visit(ctx._val)
+        }
+    }
+    visitDclArrAssignment(ctx: DclArrAssignmentContext): any {
+        return {
+            type: 'DclArrAssignment',
+            t: this.visit(ctx._t),
+            id: ctx.ID(),
+            val: this.visit(ctx._val)
+        }
+    }
+    visitArrIndex(ctx: ArrIndexContext): any {
+        return {
+            type: 'ArrIndex',
+            id: ctx.ID(),
+            index: this.visit(ctx._index)
         }
     }
     visitReturnStatement(ctx: ReturnStatementContext): any {

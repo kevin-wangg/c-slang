@@ -490,7 +490,53 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
         push(A, node.prog, {type: "Pop_i"} , { type: 'Assignment', lv: { type: 'IdLvalue', id: node.glob.id}, val: node.val}, node.glob)
     },
 
+    DclArrAssignment: function* (node: any, context: Context) {
+        push(A, { type: 'ArrAssignment_i', arrType: node.t, lv: node.id }, node.arrinit)
+        push(S, { type: 'ArrElems_i'})
+    },
+
+    ArrIndex: function* (node: any, context: Context) {
+        if (node.expr.type != 'Int') {
+            throw new Error('Array must be indexed with an int')
+        }
+        push(A, { type: 'StarExpr', first: { type: 'BinopExpr', first: { type: 'IdExpr', id: node.id}, second: node.expr }})
+    },
+
+    ArrInitElems: function* (node: any, context: Context) {
+        push(A, node.list)
+    },
+
+    ArrInitEmpty: function* (node: any, context: Context) {
+        // Do Nothing
+    },
+
+    SingleArrElem: function* (node: any, context: Context) {
+        push(A, node.first)
+    },
+
+    MultiArrElems: function* (node: any, context: Context) {
+        push(A, node.rest, node.first)
+    },
+
     // Instructions
+
+    ArrAssignment_i: function* (node: any, context: Context) {
+        let curr = S.pop()
+        let isFirst = true
+        while (!(curr !== null && typeof curr === 'object' && curr.hasOwnProperty('type') && curr.type === 'ArrElems_i')) {
+            if (!isTypeMatch(curr, node.arrType)) {
+                throw new Error('Array elements in ' + node.lv + ' are not of type ' + node.arrType)
+            }
+            const addr = stack_allocate(node.t.type, type_sizes[node.t.type])
+            if (isFirst) {
+                assign(node.lv, addr, E)
+                isFirst = false
+            }
+            curr = S.pop()
+            
+        }
+    },
+
     MallocExpr_i: function* (node: any, context: Context) {
         const bytes_to_allocate = S.pop()
         const addr = heap_allocate('AnyType', bytes_to_allocate)
@@ -718,6 +764,8 @@ export function* evaluate(node: es.Node, context: Context) {
         // console.log('------------------------------')
 
         const cmd = A.pop()
+        console.log("Evaluating command:")
+        console.log(cmd)
         yield* evaluators[cmd.type](cmd, context)
         i++
     }
