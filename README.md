@@ -59,7 +59,7 @@ Usage: c-slang [PROGRAM_STRING] [OPTION]
 Hint: In `bash` you can take the `PROGRAM_STRING` out of a file as follows:
 
 ```{.}
-$ calc-slang -n -e "$(< my_source_program.js)"
+$ c-slang -n -e "$(< my_source_program.js)"
 ```
 
 # Using your xx-slang in your local Source Academy
@@ -71,7 +71,7 @@ your own local frontend. Assume that you have built your own frontend locally,
 here is how you can make it use your own xx-slang, instead of the one that the
 Source Academy team has deployed to npm.
 
-First, build and link your local xx-slang: (don't forget to modify the "calc-slang" in both projects)
+First, build and link your local xx-slang: (don't forget to modify the "c-slang" in both projects)
 
 ```{.}
 $ cd xx-slang
