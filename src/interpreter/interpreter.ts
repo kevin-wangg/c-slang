@@ -764,7 +764,7 @@ export function* evaluate(node: es.Node, context: Context) {
         // console.log('------------------------------')
 
         const cmd = A.pop()
-        console.log("Evaluating command:")
+        console.log('Evaluating command:')
         console.log(cmd)
         yield* evaluators[cmd.type](cmd, context)
         i++
