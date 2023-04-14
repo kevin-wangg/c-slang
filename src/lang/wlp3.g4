@@ -24,13 +24,7 @@ type: 'int' # IntType
     | 'bool*' # BoolStarType
     | 'char*' # CharStarType
     ;
-expr: INT # Int
-    | BOOL # Bool
-    | CHAR # Char
-    | '(' inner=expr ')' # Parentheses
-    | '*' first=expr # StarExpr
-	| '&' first=lvalue # AmpersandExpr
-	| unop=unaryoperator first=expr # UnopExpr
+expr: unop=unaryoperator first=expr # UnopExpr
 	| id=ID # IdExpr
 	| id=ID '(' arglst=args ')' # FnExpr
 	| 'malloc' '(' first=expr ')' # MallocExpr
@@ -40,6 +34,12 @@ expr: INT # Int
     | d=dcl '=' val=expr # DclAssignment
     | t=type id=ID '['']' '=' '{' val=arrinit '}' #DclArrAssignment
     | id=ID '[' index=expr ']' #ArrIndex
+    | INT # Int
+    | BOOL # Bool
+    | CHAR # Char
+    | '(' inner=expr ')' # Parentheses
+    | '*' first=expr # StarExpr
+	| '&' first=lvalue # AmpersandExpr
     ;
 statement: 'if' '(' pred=predicate ')' cons=block # IfStatement
          | 'if' '(' pred=predicate ')' cons=block 'else' alt=block # IfElseStatement
@@ -93,3 +93,7 @@ BOOL    : 'true' | 'false';
 CHAR    : '\''.'\'';
 ID: [a-zA-Z_][a-zA-Z_0-9]* ;
 
+LineComment
+    :   '//' ~[\r\n]*
+        -> skip
+    ;
