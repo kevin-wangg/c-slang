@@ -723,7 +723,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     },
 
     Print_i: function* (node: any, context: Context) {
-        let val = S.pop()
+        const val = S.pop()
         output.push(val)
     },
 
