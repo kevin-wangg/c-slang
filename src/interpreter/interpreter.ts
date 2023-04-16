@@ -194,8 +194,6 @@ let S: Array<any>
 
 let E: Pair<any, any>
 
-let output: Array<any>
-
 /**
  * WARNING: Do not use object literal shorthands, e.g.
  *   {
@@ -725,8 +723,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     Print_i: function* (node: any, context: Context) {
         const val = S.pop()
         console.log(val)
-        console.log(val.toString())
-        output.push(JSON.stringify(val))
+        context.printStatements.push(String(val))
     },
 
     Break_i: function* (node: any, context: Context) {
@@ -770,8 +767,8 @@ export function* evaluate(node: es.Node, context: Context) {
         A = []
         A.push(node)
         S = []
-        output = []
         E = pair(global_frame, global_environment)
+        context.printStatements = []
 
         initialize_machine(1000) // start program with 1000 bytes of memory
 
@@ -804,16 +801,10 @@ export function* evaluate(node: es.Node, context: Context) {
             throw new Error('internal error: stash must be singleton but is not')
         }
         yield* leave(context)
-        ret = {
-            output,
-            value: S[0]
-        }
+        ret = S[0]
     } catch (error) {
         console.log(error)
-        ret = {
-            output,
-            value: error.message
-        }
+        ret = error.message
     } finally {
         return ret
     }

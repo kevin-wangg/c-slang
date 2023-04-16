@@ -141,6 +141,11 @@ export interface Context<T = any> {
      * Code previously executed in this context
      */
     previousCode: string[]
+
+    /**
+     * Print statements
+     */
+    printStatements: string[]
 }
 
 export type ModuleContext = {
