@@ -759,48 +759,60 @@ const step_limit = 100000
 export function* evaluate(node: es.Node, context: Context) {
     // An environment is null or a pair whose head is a frame
     // and whose tail is an environment.
-    const global_frame = {}
-    const global_environment = null
+    let ret
 
-    A = []
-    A.push(node)
-    S = []
-    output = []
-    E = pair(global_frame, global_environment)
+    try {
+        const global_frame = {}
+        const global_environment = null
 
-    initialize_machine(1000) // start program with 1000 bytes of memory
+        A = []
+        A.push(node)
+        S = []
+        output = []
+        E = pair(global_frame, global_environment)
 
-    let i = 0
-    while (i < step_limit) {
-        if (A.length === 0) {
-            break
+        initialize_machine(1000) // start program with 1000 bytes of memory
+
+        let i = 0
+        while (i < step_limit) {
+            if (A.length === 0) {
+                break
+            }
+
+            // Debugging
+            // console.log('PRINTING A')
+            // console.log(A)
+            // console.log('PRINTING S')
+            // console.log(S)
+            // console.log('PRINTING E')
+            // console.log(E)
+            // console.log('PRINTING HEAP')
+            // console.log(HEAP)
+            // console.log('------------------------------')
+
+            const cmd = A.pop()
+            yield* evaluators[cmd.type](cmd, context)
+            i++
         }
 
-        // Debugging
-        // console.log('PRINTING A')
-        // console.log(A)
-        // console.log('PRINTING S')
-        // console.log(S)
-        // console.log('PRINTING E')
-        // console.log(E)
-        // console.log('PRINTING HEAP')
-        // console.log(HEAP)
-        // console.log('------------------------------')
-
-        const cmd = A.pop()
-        yield* evaluators[cmd.type](cmd, context)
-        i++
-    }
-
-    if (i === step_limit) {
-        throw new Error('step limit ' + step_limit + ' exceeded')
-    }
-    if (S.length > 1 || S.length < 1) {
-        throw new Error('internal error: stash must be singleton but is not')
-    }
-    yield* leave(context)
-    return {
-        output,
-        value: S[0]
+        if (i === step_limit) {
+            throw new Error('step limit ' + step_limit + ' exceeded')
+        }
+        if (S.length > 1 || S.length < 1) {
+            throw new Error('internal error: stash must be singleton but is not')
+        }
+        yield* leave(context)
+        ret = {
+            output,
+            value: S[0]
+        }
+    } catch(error) {
+        console.log(error)
+        ret = {
+            output,
+            value: error.stack
+        }
+    } finally {
+        return ret
     }
 }
