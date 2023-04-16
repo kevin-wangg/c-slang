@@ -724,7 +724,9 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
     Print_i: function* (node: any, context: Context) {
         const val = S.pop()
-        output.push(val)
+        console.log(val)
+        console.log(val.toString())
+        output.push(JSON.stringify(val))
     },
 
     Break_i: function* (node: any, context: Context) {
@@ -806,11 +808,11 @@ export function* evaluate(node: es.Node, context: Context) {
             output,
             value: S[0]
         }
-    } catch(error) {
+    } catch (error) {
         console.log(error)
         ret = {
             output,
-            value: error.stack
+            value: error.message
         }
     } finally {
         return ret
